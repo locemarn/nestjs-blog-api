@@ -1,0 +1,93 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+  previewFeatures = ["driverAdapters", "relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  email           String            @unique @db.VarChar(50)
+  username        String            @unique @db.VarChar(50)
+  password        String            @db.VarChar(100)
+  role            Role
+  created_at      DateTime          @default(now()) @db.Timestamp(6)
+  updated_at      DateTime          @default(now()) @db.Timestamp(6)
+  comments        Comment[]
+  likes           Like[]
+  posts           Post[]
+  commentResponse CommentResponse[]
+
+  @@map("users")
+}
+
+model Post {
+  id         Int        @id @default(autoincrement())
+  title      String     @db.VarChar(255)
+  content    String
+  published  Boolean    @default(false)
+  userId     Int?
+  created_at DateTime   @default(now()) @db.Timestamp(6)
+  updated_at DateTime   @default(now()) @db.Timestamp(6)
+  comments   Comment[]
+  likes      Like[]
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories Category[] @relation("CategoryToPost")
+
+  @@map("posts")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(20)
+  posts Post[] @relation("CategoryToPost")
+
+  @@map("categories")
+}
+
+model Comment {
+  id         Int               @id @default(autoincrement())
+  content    String
+  postId     Int
+  created_at DateTime          @default(now()) @db.Timestamp(6)
+  updated_at DateTime          @default(now()) @db.Timestamp(6)
+  userId     Int
+  post       Post              @relation(fields: [postId], references: [id])
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  response   CommentResponse[]
+
+  @@map("comments")
+}
+
+model CommentResponse {
+  id         Int      @id @default(autoincrement())
+  content    String
+  userId     Int
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  commentId  Int
+  comments   Comment  @relation(fields: [commentId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("response")
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  postId     Int
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  userId     Int?
+  post       Post     @relation(fields: [postId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@map("likes")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
