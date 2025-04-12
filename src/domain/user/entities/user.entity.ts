@@ -5,6 +5,7 @@ import {
   ArgumentInvalidException,
   ArgumentOutOfRangeException,
 } from '../exceptions/user.exceptions';
+import { Email } from '../value-objects/email.vo';
 
 export enum Role {
   USER = 'USER',
@@ -12,7 +13,7 @@ export enum Role {
 }
 
 export interface UserProps {
-  email: string;
+  email: Email;
   username: string;
   password: string;
   role: Role;
@@ -28,8 +29,11 @@ export class User extends BaseEntity<UserProps> {
   public static create(props: UserProps, id?: Identifier): User {
     this.validateProps(props);
     const now = new Date();
+    const email: Email = Email.create(props.email as unknown as string);
+
     const userProps: UserProps = {
       ...props,
+      email,
       created_at: props.created_at ?? now,
       updated_at: props.updated_at ?? now,
     };
@@ -38,7 +42,7 @@ export class User extends BaseEntity<UserProps> {
   }
 
   // --- Getters for safe access ---
-  get email(): string {
+  get email(): Email {
     return this._props.email;
   }
 
@@ -102,7 +106,7 @@ export class User extends BaseEntity<UserProps> {
     // Add more specific format validations (e.g., email format, username length/chars)
     if (props.username.length > 50)
       throw new ArgumentOutOfRangeException('Username too long');
-    if (props.email.length > 50)
+    if ((props.email as unknown as string).length > 50)
       throw new ArgumentOutOfRangeException('Email too long');
     // etc.
   }
