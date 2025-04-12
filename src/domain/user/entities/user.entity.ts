@@ -4,7 +4,7 @@ import {
   ArgumentNotProvidedException,
   ArgumentInvalidException,
   ArgumentOutOfRangeException,
-} from '../exceptions/user.exceptions';
+} from '../../exceptions/domain.exceptions';
 import { Email } from '../value-objects/email.vo';
 
 export enum Role {
@@ -54,11 +54,11 @@ export class User extends BaseEntity<UserProps> {
     return this._props.role;
   }
 
-  get createdAt(): Date {
+  get created_at(): Date {
     return this._props.created_at;
   }
 
-  get updatedAt(): Date {
+  get updated_at(): Date {
     return this._props.updated_at;
   }
 

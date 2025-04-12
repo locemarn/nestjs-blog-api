@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/domain/shared/base-entity';
 import { Identifier } from 'src/domain/shared/identifier';
-import { ArgumentNotProvidedException } from 'src/domain/user/exceptions/user.exceptions';
+import { ArgumentNotProvidedException } from 'src/domain/exceptions/domain.exceptions';
 
 export interface PostProps {
   title: string;

@@ -1,4 +1,4 @@
-import { ArgumentInvalidException } from '../exceptions/user.exceptions';
+import { ArgumentInvalidException } from '../../exceptions/domain.exceptions';
 
 export class Email {
   private constructor(private readonly value: string) {

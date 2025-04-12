@@ -25,8 +25,8 @@ describe('User Entity', () => {
     expect(user.email.Value).toBe(minimalValueProps.email);
     expect(user.username).toBe(minimalValueProps.username);
     expect(user.role).toBe(minimalValueProps.role);
-    expect(user.createdAt).toEqual(minimalValueProps.created_at);
-    expect(user.updatedAt).toEqual(minimalValueProps.updated_at);
+    expect(user.created_at).toEqual(minimalValueProps.created_at);
+    expect(user.updated_at).toEqual(minimalValueProps.updated_at);
   });
 
   it('should create a user with a specific ID', () => {
