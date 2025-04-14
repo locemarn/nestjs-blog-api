@@ -6,6 +6,8 @@ import {
   ArgumentOutOfRangeException,
 } from '../../exceptions/domain.exceptions';
 import { Email } from '../value-objects/email.vo';
+import { UserCreatedEvent } from '../events/user-created.event';
+import { UserUpdatedEvent } from '../events/user-updated.event';
 
 export enum Role {
   USER = 'USER',
@@ -40,6 +42,9 @@ export class User extends BaseEntity<UserProps> {
       updated_at: props.updated_at ?? now,
     };
     const user = new User(userProps, id);
+    if (!id) {
+      user.addDomainEvent(new UserCreatedEvent(user.id));
+    }
     return user;
   }
 
@@ -66,21 +71,51 @@ export class User extends BaseEntity<UserProps> {
 
   // --- Business Logic Methods ---
   public updateUsername(newUsername: string): void {
+    const trimmedUsername = newUsername.trim();
     if (!newUsername || newUsername.trim().length < 3)
       throw new ArgumentNotProvidedException('New username is required');
     if (newUsername.length > 50)
       throw new ArgumentOutOfRangeException(
         'Username cannot exceed 50 characters.',
       );
-    this._props.username = newUsername.trim();
-    this.touch();
+
+    if (this._props.username !== trimmedUsername) {
+      this._props.username = trimmedUsername;
+      this.touch();
+      this.addDomainEvent(new UserUpdatedEvent(this._id, [trimmedUsername]));
+    }
+  }
+
+  public updateEmail(newEmail: string): void {
+    const normalizedEmail = newEmail.toLocaleLowerCase().trim();
+    const email = Email.create(normalizedEmail);
+    if (this._props.email !== email.Value) {
+      this._props.email = email.Value;
+      this.touch();
+      this.addDomainEvent(new UserUpdatedEvent(this.id, [email.Value]));
+    }
+  }
+
+  public changeRole(newRole: Role): void {
+    if (!newRole || !Object.values(Role).includes(newRole))
+      throw new ArgumentInvalidException('Invalid user role');
+
+    if (this._props.role !== newRole) {
+      this._props.role = newRole;
+      this.touch();
+      this.addDomainEvent(new UserUpdatedEvent(this.id, [newRole]));
+    }
   }
 
   public changePassword(newPassword: string): void {
     if (!newPassword)
       throw new ArgumentNotProvidedException('New password is required');
-    this._props.password = newPassword.trim();
-    this.touch();
+    if (this._props.password !== newPassword) {
+      this._props.password = newPassword;
+      this.touch();
+      // Avoid adding password changes to generic UserUpdatedEvent unless needed
+      // Consider a specific PasswordChangedEvent if required
+    }
   }
 
   public promoteToAdmin(): void {
