@@ -1,32 +1,29 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Role, User, UserProps } from './user.entity';
 import { Identifier } from 'src/domain/shared/identifier';
-import { Email } from '../value-objects/email.vo';
 
 describe('User Entity', () => {
   let minimalValueProps: UserProps;
 
   beforeEach(() => {
     minimalValueProps = {
-      email: 'test@email.com' as unknown as Email,
+      email: 'test@email.com',
       username: 'testuser',
       password: 'hashed_password',
       role: Role.USER,
-      created_at: new Date(),
-      updated_at: new Date(),
     };
   });
 
   it('should create a user with minimal properties', () => {
     const user = User.create(minimalValueProps);
+
     expect(user).toBeInstanceOf(User);
     expect(user.id.Value).toBe(0);
-    expect(user.email).toBeInstanceOf(Email);
-    expect(user.email.Value).toBe(minimalValueProps.email);
+    expect(user.email).toBe(minimalValueProps.email);
     expect(user.username).toBe(minimalValueProps.username);
     expect(user.role).toBe(minimalValueProps.role);
-    expect(user.created_at).toEqual(minimalValueProps.created_at);
-    expect(user.updated_at).toEqual(minimalValueProps.updated_at);
+    expect(user._props.created_at).toBeInstanceOf(Date);
+    expect(user._props.updated_at).toBeInstanceOf(Date);
   });
 
   it('should create a user with a specific ID', () => {
