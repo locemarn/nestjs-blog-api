@@ -13,12 +13,12 @@ export enum Role {
 }
 
 export interface UserProps {
-  email: Email;
+  email: string;
   username: string;
   password: string;
   role: Role;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export class User extends BaseEntity<UserProps> {
@@ -32,8 +32,10 @@ export class User extends BaseEntity<UserProps> {
     const email: Email = Email.create(props.email as unknown as string);
 
     const userProps: UserProps = {
-      ...props,
-      email,
+      username: props.username,
+      password: props.password,
+      email: email.Value,
+      role: props.role,
       created_at: props.created_at ?? now,
       updated_at: props.updated_at ?? now,
     };
@@ -42,7 +44,7 @@ export class User extends BaseEntity<UserProps> {
   }
 
   // --- Getters for safe access ---
-  get email(): Email {
+  get email(): string {
     return this._props.email;
   }
 
@@ -54,13 +56,13 @@ export class User extends BaseEntity<UserProps> {
     return this._props.role;
   }
 
-  get created_at(): Date {
-    return this._props.created_at;
-  }
+  // get created_at(): Date {
+  //   return this._props.created_at;
+  // }
 
-  get updated_at(): Date {
-    return this._props.updated_at;
-  }
+  // get updated_at(): Date {
+  //   return this._props.updated_at;
+  // }
 
   // --- Business Logic Methods ---
   public updateUsername(newUsername: string): void {
