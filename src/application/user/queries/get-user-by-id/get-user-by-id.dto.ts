@@ -5,7 +5,7 @@ export class UserOutputDto {
   readonly email: string;
   readonly username: string;
   readonly role: Role;
-  readonly created_at: Date;
-  readonly updated_at: Date;
+  readonly created_at?: Date;
+  readonly updated_at?: Date;
   // Add any other publicly safe fields you might want later (e.g., postCount)
 }
