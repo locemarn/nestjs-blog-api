@@ -34,8 +34,8 @@ const mockQueryBus = { execute: vi.fn() };
 describe('UpdateUserCommandHandler', () => {
   let handler: UpdateUserCommandHandler;
   let repository: IUserRepository;
-  let eventBus: EventBus;
-  let queryBus: QueryBus;
+  // let eventBus: EventBus;
+  // let queryBus: QueryBus;
 
   const userId = Identifier.create(1);
   const existingUserData: UserProps = {
@@ -69,8 +69,8 @@ describe('UpdateUserCommandHandler', () => {
       mockQueryBus as unknown as QueryBus,
     );
     repository = moduleRef.get(USER_REPOSITORY_TOKEN);
-    eventBus = moduleRef.get(EventBus);
-    queryBus = moduleRef.get(QueryBus);
+    // eventBus = moduleRef.get(EventBus);
+    // queryBus = moduleRef.get(QueryBus);
 
     // Default mock implementations
     mockUserRepository.findById.mockResolvedValue(resetExistingUserEntity()); // Return a fresh instance
@@ -140,7 +140,7 @@ describe('UpdateUserCommandHandler', () => {
     mockUserRepository.findById.mockResolvedValue(updatedUser);
     mockUserRepository.save.mockResolvedValue(updatedUser);
 
-    const result = await handler.execute(command);
+    await handler.execute(command);
 
     expect(mockUserRepository.save).toHaveBeenCalled();
     expect(mockEventBus.publish).toHaveBeenCalled();
