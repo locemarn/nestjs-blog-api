@@ -1,0 +1,69 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""Data required to create a new user"""
+input CreateUserInput {
+  email: String!
+  password: String!
+  role: Role = USER
+  username: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DeleteUserPayload {
+  success: Boolean!
+}
+
+type Mutation {
+  """Create a new user account."""
+  createUser(input: CreateUserInput!): User!
+
+  """Delete a user by ID."""
+  deleteUser(id: ID!): DeleteUserPayload!
+
+  """Update an existing user."""
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+}
+
+type Query {
+  userByEmail(email: String!): User
+  userById(id: ID!): User
+}
+
+"""User roles (USER, ADMIN, etc.)"""
+enum Role {
+  ADMIN
+  USER
+}
+
+"""Data for updating an existing user (provide only fields to change)"""
+input UpdateUserInput {
+  email: String
+  role: Role
+  username: String
+}
+
+type User {
+  """Timestamp when the user was created"""
+  created_at: DateTime!
+
+  """User's unique email address"""
+  email: String!
+
+  """Unique identifier for the user"""
+  id: ID!
+
+  """User's assigned role"""
+  role: Role!
+
+  """Timestamp when the user was last updated"""
+  updated_at: DateTime!
+
+  """User's unique username"""
+  username: String!
+}

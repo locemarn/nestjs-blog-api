@@ -10,6 +10,7 @@ import { LogUserCreatedHandler } from './event-handlers/log-user-created.handler
 import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserMapper } from './mappers/user.mapper';
+import { InfrastructureModule } from 'src/infrastructure/infrastructure.module';
 
 export const UserCommandHandlers: Provider[] = [
   CreateUserCommandHandler,
@@ -25,7 +26,7 @@ export const UserQueryHandlers: Provider[] = [
 export const UserEventHandlers: Provider[] = [LogUserCreatedHandler];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [CqrsModule, InfrastructureModule],
   providers: [
     UserMapper,
     ...UserCommandHandlers,

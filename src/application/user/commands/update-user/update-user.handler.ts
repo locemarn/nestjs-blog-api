@@ -68,10 +68,12 @@ export class UpdateUserCommandHandler
     // 5. Publish Domain Events registered on the entity
     // Pass the NestJS EventBus instance (which implements IEventPublisher)
     await updatedUser.publishEvents(this.eventBus);
-
     // 6. Fetch and return the updated user DTO
-    return await this.queryBus.execute<GetUserByIdQuery, UpdateUserOutputDto>(
-      new GetUserByIdQuery(+updatedUser.id.Value),
-    );
+    const res = await this.queryBus.execute<
+      GetUserByIdQuery,
+      UpdateUserOutputDto
+    >(new GetUserByIdQuery(+updatedUser.id.Value));
+
+    return res;
   }
 }

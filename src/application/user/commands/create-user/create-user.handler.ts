@@ -60,7 +60,6 @@ export class CreateUserCommandHandler
       // 4. Persist using repository
       const savedUser = await this.userRepository.save(user);
 
-      console.log('savedUser', savedUser);
       // 5. Optional: Publish domain events
       // user.events.forEach(event => this.eventBus.publish(event));
 
