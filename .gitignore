@@ -35,8 +35,16 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# IDE - WebStorm
+.idea/*
+!.idea/settings.json
+!.idea/tasks.json
+!.idea/launch.json
+!.idea/extensions.json
+
 # dotenv environment variable files
 .env
+.env.test
 .env.development.local
 .env.test.local
 .env.production.local

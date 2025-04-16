@@ -29,8 +29,11 @@ export class PrismaService
     try {
       await this.$connect();
       this.logger.log('Successfully connected to the database');
-    } catch (e) {
-      this.logger.error('Failed to connect to the database', e.stack);
+    } catch (e: unknown) {
+      this.logger.error(
+        'Failed to connect to the database',
+        e instanceof Error ? e.stack : String(e),
+      );
       process.exit(1);
     }
   }
@@ -70,14 +73,17 @@ export class PrismaService
         this.user.deleteMany({ where: {} }), // Delete all users
       ]);
       this.logger.log('TEST database cleaned successfully.');
-    } catch (error) {
-      this.logger.error('Error cleaning TEST database', error.stack);
+    } catch (error: unknown) {
+      this.logger.error(
+        'Error cleaning TEST database',
+        error instanceof Error ? error.stack : String(error),
+      );
       throw error; // Re-throw to fail tests if cleanup fails
     }
   }
 
   // Helper for test setup
-  async applyMigrations() {
+  applyMigrations() {
     if (process.env.NODE_ENV !== 'test') {
       this.logger.error(
         'Attempted to apply migrations outside of TEST environment!',
@@ -93,10 +99,10 @@ export class PrismaService
         env: process.env,
       });
       this.logger.log('TEST database migrations applied successfully.');
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         'Failed to apply migrations to test database',
-        error.stack,
+        error instanceof Error ? error.stack : String(error),
       );
       throw new Error('Migration failed, cannot run tests.');
     }
