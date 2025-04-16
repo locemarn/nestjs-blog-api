@@ -6,17 +6,19 @@ import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { UserAppModule } from './application/user/user.module';
 import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module';
 import { PrismaUserRepository } from './infrastructure/persistence/repositories/prisma-user.repository';
+import { AppGraphQLModule } from './presentation/graphql/graphql.module';
+import { UserResolver } from './presentation/graphql/user/user.resolver';
 
 @Module({
   imports: [
+    CqrsModule.forRoot(),
+    InfrastructureModule,
+    UserAppModule,
     PrismaModule,
     UserAppModule,
-    CqrsModule.forRoot(), // Core CQRS
-    InfrastructureModule, // Provides DB access, hashing, etc.
-    UserAppModule, // User application logic (depends on Infra interfaces)
-    // GraphqlConfigModule, // GraphQL setup
+    AppGraphQLModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaUserRepository],
+  providers: [AppService, PrismaUserRepository, UserResolver],
 })
 export class AppModule {}

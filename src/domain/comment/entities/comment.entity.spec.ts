@@ -18,8 +18,6 @@ describe('Comment Entity', () => {
   it('shlould create a valid comment with minimal value props', () => {
     const comment = Comment.create(minimalValueProps);
 
-    console.log('comment --->', comment);
-
     expect(comment).toBeInstanceOf(Comment);
   });
 

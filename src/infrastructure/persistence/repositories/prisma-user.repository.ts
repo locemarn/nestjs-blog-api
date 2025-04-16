@@ -68,7 +68,6 @@ export class PrismaUserRepository implements IUserRepository {
         // --- UPDATE ---
         this.logger.debug(`Updating user with ID: ${userIdValue}`);
         const idForWhere = userIdValue as number;
-        // Create explicit update data object
         const updateData: Prisma.UserUpdateInput = {
           email: persistenceMappedData.email,
           username: persistenceMappedData.username,
@@ -158,6 +157,7 @@ export class PrismaUserRepository implements IUserRepository {
       const prismaUser = await this._prisma.user.findUnique({
         where: { email },
       });
+
       return this.mapToDomain(prismaUser);
     } catch (error) {
       this.logger.error(

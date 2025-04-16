@@ -35,7 +35,6 @@ export class GetUserByIdQueryHandler
     }
 
     // 4. Map the domain entity to the Output DTO using the mapper
-    console.log('this.userMapper ---->', UserMapper);
     const userDto = this.userMapper.toDto(user);
 
     // 5. Return the DTO
