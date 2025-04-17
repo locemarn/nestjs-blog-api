@@ -1,12 +1,25 @@
-import { BaseEntity } from 'src/domain/shared/base-entity';
+import { PostTitleVo } from '../value-objects/post-title.vo';
+import { PostContentVo } from '../value-objects/post-content.vo';
 import { Identifier } from 'src/domain/shared/identifier';
-import { ArgumentNotProvidedException } from 'src/domain/exceptions/domain.exceptions';
+import { BaseEntity } from '../../shared/base-entity';
+import { PostCreatedEvent } from '../events/post-created.event';
+import {
+  ArgumentNotProvidedException,
+  CategoryAssociationException,
+  PostContentMissingException,
+  PostIsAlreadyPublishedException,
+  PostIsNotPublishedException,
+} from '../exceptions/post.exceptions';
+import { PostPublishedEvent } from '../events/post-published.event';
+import { PostUnpublishedEvent } from '../events/post-unpublished.event';
+import { PostUpdatedEvent } from '../events/post-updated.event';
 
 export interface PostProps {
-  title: string;
-  content: string;
+  title: PostTitleVo;
+  content: PostContentVo;
   published: boolean;
-  userId: Identifier;
+  userId: Identifier; // Reference User by ID
+  categoryIds: Identifier[]; // Reference Categories by ID
   created_at: Date;
   updated_at: Date;
 }
@@ -16,98 +29,128 @@ export class Post extends BaseEntity<PostProps> {
     super(props, id);
   }
 
-  static create(props: PostProps, id?: Identifier): Post {
+  // --- Getters ---
+  get title(): PostTitleVo {
+    return this._props.title;
+  }
+
+  get content(): PostContentVo {
+    return this._props.content;
+  }
+
+  get isPublished(): boolean {
+    return this._props.published;
+  }
+
+  get authorId(): Identifier {
+    return this._props.userId;
+  }
+
+  get categoryIds(): Identifier[] {
+    return [...this._props.categoryIds];
+  } // Return copy
+
+  get createdAt(): Date {
+    return this._props.created_at;
+  }
+
+  get updatedAt(): Date {
+    return this._props.updated_at;
+  }
+
+  public static create(props: PostProps, id?: Identifier): Post {
     this.validateProps(props);
     const now = new Date();
-    const postprops: PostProps = {
+    const postProps: PostProps = {
       ...props,
+      published: props.published ?? false,
+      categoryIds: props.categoryIds ?? [],
       created_at: props.created_at ?? now,
       updated_at: props.updated_at ?? now,
     };
 
-    const post = new Post(postprops, id);
+    const post = new Post(postProps, id);
+
+    if (!id || id.Value === 0) {
+      post.addDomainEvent(new PostCreatedEvent(post.id, post._props.userId));
+    }
+
     return post;
-  }
-
-  // --- Getters for safe access ---
-  get title(): string {
-    return this._props.title;
-  }
-
-  get content(): string {
-    return this._props.content;
-  }
-
-  get published(): boolean {
-    return this._props.published;
-  }
-
-  get userId(): Identifier {
-    return this._props.userId;
-  }
-
-  get created_at(): Date {
-    return this._props.created_at;
-  }
-
-  get updated_at(): Date {
-    return this._props.updated_at;
-  }
-
-  // --- Business Logic Methods ---
-  public updateTitle(newTitle: string): void {
-    if (!newTitle || newTitle.trim().length < 3)
-      throw new ArgumentNotProvidedException('Title must be provide');
-
-    if (newTitle.trim().length > 100)
-      throw new ArgumentNotProvidedException('Title is too long');
-
-    this._props.title = newTitle;
-    this.touch();
-  }
-
-  public updateContent(newContent: string): void {
-    if (!newContent || newContent.trim().length < 3)
-      throw new ArgumentNotProvidedException('Content must be provide');
-
-    this._props.content = newContent;
-    this.touch();
-  }
-
-  public setPublish(): void {
-    this._props.published = true;
-    this.touch();
-  }
-
-  public setUnpublish(): void {
-    this._props.published = false;
-    this.touch();
   }
 
   // --- Validation ---
   private static validateProps(props: PostProps): void {
     if (!props.title)
       throw new ArgumentNotProvidedException('Post title is required');
+  }
 
-    if (props.title.length < 3)
-      throw new ArgumentNotProvidedException('Post title is too short');
+  // --- Business Methods ---
+  public publish(): void {
+    if (this.isPublished)
+      throw new PostIsAlreadyPublishedException(this.id.Value);
 
-    if (props.title.length > 100)
-      throw new ArgumentNotProvidedException('Post title is too long');
+    if (!this._props.content || this._props.content.Value.trim().length === 0)
+      throw new PostContentMissingException();
 
-    if (!props.content)
-      throw new ArgumentNotProvidedException('Post content is required');
+    this._props.published = true;
+    this.touch();
+    this.addDomainEvent(new PostPublishedEvent(this.id));
+  }
 
-    if (props.content.length < 3)
-      throw new ArgumentNotProvidedException('Post content is too short');
+  public unpublish(): void {
+    if (!this.isPublished) throw new PostIsNotPublishedException(this.id.Value);
 
-    if (!props.userId)
-      throw new ArgumentNotProvidedException('Post userId is required');
+    this._props.published = false;
+    this.touch();
+    this.addDomainEvent(new PostUnpublishedEvent(this.id));
+  }
 
-    if (!(props.userId instanceof Identifier))
-      throw new ArgumentNotProvidedException(
-        'Post userId must be an instance of Identifier',
+  public updateTitle(newTitle: PostTitleVo): void {
+    if (!this._props.title.equals(newTitle)) {
+      this._props.title = newTitle;
+      this.touch();
+      this.addDomainEvent(new PostUpdatedEvent(this.id, ['title']));
+    }
+  }
+
+  public updateContent(newContent: PostContentVo): void {
+    if (!this._props.content.equals(newContent)) {
+      this._props.content = newContent;
+      this.touch();
+      this.addDomainEvent(new PostUpdatedEvent(this.id, ['content']));
+    }
+  }
+
+  public addCategoty(categoryId: Identifier): void {
+    if (!categoryId)
+      throw new CategoryAssociationException(
+        'Category ID cannot be null or undefined when adding.',
       );
+    const hasCategory = this._props.categoryIds.some((id) =>
+      id.equals(categoryId),
+    );
+    if (!hasCategory) {
+      this._props.categoryIds.push(categoryId);
+      this.touch();
+      this.addDomainEvent(new PostUpdatedEvent(categoryId, ['categories']));
+    }
+  }
+
+  public removeCategory(categoryId: Identifier): void {
+    if (!categoryId) {
+      throw new CategoryAssociationException(
+        'Category ID cannot be null or undefined when removing.',
+      );
+    }
+    const initialLength = this._props.categoryIds.length;
+    this._props.categoryIds = this._props.categoryIds.filter(
+      (id) => !id.equals(categoryId),
+    );
+    if (this._props.categoryIds.length < initialLength) {
+      // If removal actually happened
+      this.touch();
+      this.addDomainEvent(new PostUpdatedEvent(this.id, ['categories']));
+    }
   }
 
   // --- Helper Methods ---

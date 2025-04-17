@@ -1,10 +1,21 @@
-import { Identifier } from 'src/domain/shared/identifier';
+import { Identifier } from '../../shared/identifier';
 import { Post } from '../entities/post.entity';
 
-export interface IPostRepository {
-  save(post: Post): Promise<Post>;
-  update(id: Identifier, post: Post): Promise<Post | null>;
-  findById(id: Identifier): Promise<Post | null>;
-  delete(id: Identifier): Promise<boolean>;
-  getPosts(limit: number, offset: number): Promise<Post[]>;
+export interface FindPostQuery {
+  authorId?: Identifier;
+  categoryId?: Identifier;
+  published?: boolean;
+  skip?: number;
+  take?: number;
 }
+
+export interface IPostRepository {
+  save: (post: Post) => Promise<void>;
+  findById: (id: string) => Promise<Post | null>;
+  delete: (id: string) => Promise<boolean>;
+  find: (query: FindPostQuery) => Promise<Post[]>;
+  findPublishedPosts: (skip?: number, take?: number) => Promise<Post[]>;
+  findByAuthorId: (authorId: string) => Promise<Post | null>;
+}
+
+export const POST_REPOSITORY_TOKEN = Symbol('IPostRepository');
