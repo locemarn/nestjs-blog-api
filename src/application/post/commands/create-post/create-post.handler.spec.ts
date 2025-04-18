@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { EventBus, QueryBus } from '@nestjs/cqrs';
+import { EventBus } from '@nestjs/cqrs';
 
 // Command/Handler/DTOs
 import { CreatePostCommandHandler } from './create-post.handler';
@@ -9,14 +9,8 @@ import { CreatePostCommand } from './create-post.command';
 import { CreatePostInputDto } from './create-post.dto';
 
 // Domain Interfaces/Tokens/Entities/VOs/Exceptions
-import {
-  IPostRepository,
-  POST_REPOSITORY_TOKEN,
-} from '../../../../domain/post/repositories/post.repository.interface';
-import {
-  IUserRepository,
-  USER_REPOSITORY_TOKEN,
-} from '../../../../domain/user/repositories/user.repository.interface';
+import { POST_REPOSITORY_TOKEN } from '../../../../domain/post/repositories/post.repository.interface';
+import { USER_REPOSITORY_TOKEN } from '../../../../domain/user/repositories/user.repository.interface';
 import { Identifier } from '../../../../domain/shared/identifier';
 import { Post } from '../../../../domain/post/entities/post.entity';
 import {
@@ -31,8 +25,6 @@ import { PostOutputDto } from '../../queries/get-post-by-id/get-post-by-id.dto';
 // Other Application Layer elements
 import { PostMapper } from '../../mappers/post.mapper';
 import { GetPostByIdQuery } from '../../queries/get-post-by-id/get-post-by-id.query';
-import { mock } from 'node:test';
-import { a } from 'vitest/dist/chunks/suite.d.FvehnV49';
 
 // --- Mocks ---
 const mockPostRepository = {
@@ -50,11 +42,6 @@ const mockQueryBus = { execute: vi.fn() };
 describe('CreatePostCommandHandler', () => {
   let handler: CreatePostCommandHandler;
   let eventBus: EventBus;
-
-  // let postRepo: IPostRepository;
-  // let userRepo: IUserRepository;
-  // let queryBus: QueryBus;
-  // let postMapper: PostMapper;
 
   // --- test Data Setup ---
   const authorId = Identifier.create(1);
