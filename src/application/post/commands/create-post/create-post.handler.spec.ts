@@ -23,7 +23,7 @@ import { PostContentVo } from '../../../../domain/post/value-objects/post-conten
 import { PostOutputDto } from '../../queries/get-post-by-id/get-post-by-id.dto';
 
 // Other Application Layer elements
-import { PostMapper } from '../../mappers/post.mapper';
+import { POST_MAPPER_TOKEN, PostMapper } from '../../mappers/post.mapper';
 import { GetPostByIdQuery } from '../../queries/get-post-by-id/get-post-by-id.query';
 
 // --- Mocks ---
@@ -104,7 +104,7 @@ describe('CreatePostCommandHandler', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         CreatePostCommandHandler,
-        PostMapper,
+        { provide: POST_MAPPER_TOKEN, useValue: PostMapper },
         { provide: USER_REPOSITORY_TOKEN, useValue: mockUserRepository },
         { provide: POST_REPOSITORY_TOKEN, useValue: mockPostRepository },
         // { provide: EventBus, useValue: mockEventBus },
@@ -125,9 +125,6 @@ describe('CreatePostCommandHandler', () => {
     mockPostRepository.save.mockResolvedValue(mockPostReturnedBySave);
     mockQueryBus.execute.mockResolvedValue(expectedOutputDto);
     mockQueryBus.execute.mockResolvedValue(expectedOutputDto);
-    // vi.spyOn(mockPostReturnedBySave, 'publishEvents').mockResolvedValue(
-    //   undefined,
-    // );
   });
 
   it('should create post successfully', async () => {

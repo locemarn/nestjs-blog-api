@@ -16,6 +16,7 @@ export interface IPostRepository {
   find: (query: FindPostQuery) => Promise<Post[]>;
   findPublishedPosts: (skip?: number, take?: number) => Promise<Post[]>;
   findByAuthorId: (authorId: string) => Promise<Post | null>;
+  count: (query: FindPostQuery) => Promise<number>;
 }
 
 export const POST_REPOSITORY_TOKEN = Symbol('IPostRepository');

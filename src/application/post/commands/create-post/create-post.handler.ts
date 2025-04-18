@@ -15,7 +15,7 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '../../../../domain/user/repositories/user.repository.interface';
-import { PostMapper } from '../../mappers/post.mapper';
+import { POST_MAPPER_TOKEN, PostMapper } from '../../mappers/post.mapper';
 import { Identifier } from '../../../../domain/shared/identifier';
 import { UserNotFoundException } from '../../../../domain/exceptions/domain.exceptions';
 import { PostTitleVo } from '../../../../domain/post/value-objects/post-title.vo';
@@ -38,6 +38,7 @@ export class CreatePostCommandHandler
     private readonly eventBus: EventBus,
     @Inject('QueryBus') // Use the literal string 'QueryBus'
     private readonly queryBus: QueryBus,
+    @Inject(POST_MAPPER_TOKEN)
     private readonly postMapper: PostMapper,
   ) {}
 
