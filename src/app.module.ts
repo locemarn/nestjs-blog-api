@@ -8,6 +8,7 @@ import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module'
 import { PrismaUserRepository } from './infrastructure/persistence/repositories/prisma-user.repository';
 import { AppGraphQLModule } from './presentation/graphql/graphql.module';
 import { UserResolver } from './presentation/graphql/user/user.resolver';
+import { PostAppModule } from './application/post/post.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserResolver } from './presentation/graphql/user/user.resolver';
     UserAppModule,
     PrismaModule,
     UserAppModule,
+    PostAppModule,
     AppGraphQLModule,
   ],
   controllers: [AppController],

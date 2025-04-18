@@ -10,7 +10,7 @@ export interface FindPostQuery {
 }
 
 export interface IPostRepository {
-  save: (post: Post) => Promise<void>;
+  save: (post: Post) => Promise<Post>;
   findById: (id: string) => Promise<Post | null>;
   delete: (id: string) => Promise<boolean>;
   find: (query: FindPostQuery) => Promise<Post[]>;
