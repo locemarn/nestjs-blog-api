@@ -38,9 +38,7 @@ export class PublishPostCommandHandler
     post.publish();
 
     const savedPost = await this.postRepository.save(post);
-
     await savedPost.publishEvents(this.eventBus);
-
     const resultDto = await this.queryBus.execute<
       GetPostByIdQuery,
       PostOutputDto | null

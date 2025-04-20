@@ -64,8 +64,6 @@ describe('PublishPostCommandHandler', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         PublishPostCommandHandler,
-        PostMapper,
-        { provide: POST_MAPPER_TOKEN, useExisting: PostMapper },
         { provide: POST_REPOSITORY_TOKEN, useValue: mockPostRepository },
         { provide: EventBus, useValue: mockEventBus },
         { provide: 'QueryBus', useValue: mockQueryBus },

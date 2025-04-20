@@ -83,8 +83,10 @@ export class UpdatePostCommandHandler
       }
     }
 
+    console.log('updatedData.publish --->', updatedData.publish);
+
     if (updatedData.publish !== undefined) {
-      if (!updatedData.publish) {
+      if (updatedData.publish) {
         post.publish();
       } else {
         post.unpublish();
