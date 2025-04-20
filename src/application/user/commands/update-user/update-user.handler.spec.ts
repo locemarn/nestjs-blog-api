@@ -52,7 +52,7 @@ describe('UpdateUserCommandHandler', () => {
   const resetExistingUserEntity = () => User.create(existingUserData, userId);
 
   beforeEach(async () => {
-    vi.resetAllMocks(); // Clear mocks
+    vi.resetAllMocks();
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -96,7 +96,7 @@ describe('UpdateUserCommandHandler', () => {
   });
 
   it('should update username successfully', async () => {
-    const command = new UpdateUserCommand(userId.Value, {
+    const command = new UpdateUserCommand(+userId.Value, {
       username: 'new_username',
     });
     const updatedUser = resetExistingUserEntity();
@@ -115,7 +115,7 @@ describe('UpdateUserCommandHandler', () => {
   });
 
   it('should update email successfully after checking uniqueness', async () => {
-    const command = new UpdateUserCommand(userId.Value, {
+    const command = new UpdateUserCommand(+userId.Value, {
       email: 'new_email@email.com',
     });
     const updatedUser = resetExistingUserEntity();
@@ -134,7 +134,7 @@ describe('UpdateUserCommandHandler', () => {
   });
 
   it('should update role successfully', async () => {
-    const command = new UpdateUserCommand(userId.Value, { role: Role.ADMIN });
+    const command = new UpdateUserCommand(+userId.Value, { role: Role.ADMIN });
     const updatedUser = resetExistingUserEntity();
     updatedUser.changeRole(Role.ADMIN);
     mockUserRepository.findById.mockResolvedValue(updatedUser);
@@ -148,7 +148,7 @@ describe('UpdateUserCommandHandler', () => {
   });
 
   it('should update multiple fields successfully', async () => {
-    const command = new UpdateUserCommand(userId.Value, {
+    const command = new UpdateUserCommand(+userId.Value, {
       username: 'new_username',
       role: Role.ADMIN,
       email: 'new_email@email.com',
@@ -182,7 +182,7 @@ describe('UpdateUserCommandHandler', () => {
   });
 
   it('should NOT throw EmailAlreadyExistsException if email belongs to the same user', async () => {
-    const command = new UpdateUserCommand(userId.Value, {
+    const command = new UpdateUserCommand(+userId.Value, {
       email: existingUserData.email,
     });
     mockUserRepository.findById.mockResolvedValue(existingUserEntity);
@@ -193,7 +193,7 @@ describe('UpdateUserCommandHandler', () => {
   });
 
   it('should propagate domain validation error', async () => {
-    const command = new UpdateUserCommand(userId.Value, { username: 'a' });
+    const command = new UpdateUserCommand(+userId.Value, { username: 'a' });
     await expect(handler.execute(command)).rejects.toThrow(
       'New username is required',
     );

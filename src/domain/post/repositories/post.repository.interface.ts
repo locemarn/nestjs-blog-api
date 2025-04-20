@@ -10,12 +10,13 @@ export interface FindPostQuery {
 }
 
 export interface IPostRepository {
-  save: (post: Post) => Promise<void>;
-  findById: (id: string) => Promise<Post | null>;
-  delete: (id: string) => Promise<boolean>;
+  save: (post: Post) => Promise<Post>;
+  findById: (id: number) => Promise<Post | null>;
+  delete: (id: number) => Promise<boolean>;
   find: (query: FindPostQuery) => Promise<Post[]>;
   findPublishedPosts: (skip?: number, take?: number) => Promise<Post[]>;
-  findByAuthorId: (authorId: string) => Promise<Post | null>;
+  findByAuthorId: (authorId: number) => Promise<Post | null>;
+  count: (query: FindPostQuery) => Promise<number>;
 }
 
 export const POST_REPOSITORY_TOKEN = Symbol('IPostRepository');

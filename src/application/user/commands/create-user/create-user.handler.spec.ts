@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { beforeEach, describe, vi, Mock, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
@@ -112,8 +111,8 @@ describe('CreateUserCommandHandler', () => {
         username: 'testuser',
         passwordHash: 'somehash',
         role: Role.USER,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       Identifier.create(3),
     );

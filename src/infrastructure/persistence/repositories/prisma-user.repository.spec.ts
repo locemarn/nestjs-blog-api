@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { execSync } from 'child_process';
 import { config } from 'dotenv';
 import { randomUUID } from 'crypto';
 import {
-  User,
   Role,
+  User,
   UserProps,
 } from '../../../domain/user/entities/user.entity';
 import { PrismaService } from '../prisma/prisma.service';
@@ -117,8 +117,8 @@ const generateUniqueUserData = (suffix: string | number = randomUUID()) => ({
   username: `testuser_integ_${suffix}`,
   password: `hashed_password_integ_${suffix}`,
   role: Role.USER,
-  // createdAt: new Date(), // Or omit if relying on DB default
-  // updatedAt: new Date(), // Or omit if relying on DB default/trigger
+  // created_at: new Date(), // Or omit if relying on DB default
+  // updated_at: new Date(), // Or omit if relying on DB default/trigger
 });
 
 // --- Test Suite ---

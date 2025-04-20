@@ -50,11 +50,11 @@ export class Post extends BaseEntity<PostProps> {
     return [...this._props.categoryIds];
   } // Return copy
 
-  get createdAt(): Date {
+  get created_at(): Date {
     return this._props.created_at;
   }
 
-  get updatedAt(): Date {
+  get updated_at(): Date {
     return this._props.updated_at;
   }
 
@@ -121,7 +121,7 @@ export class Post extends BaseEntity<PostProps> {
     }
   }
 
-  public addCategoty(categoryId: Identifier): void {
+  public addCategory(categoryId: Identifier): void {
     if (!categoryId)
       throw new CategoryAssociationException(
         'Category ID cannot be null or undefined when adding.',
