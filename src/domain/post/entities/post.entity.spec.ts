@@ -149,7 +149,7 @@ describe('Post Entity', () => {
       const post = Post.create(validProps, Identifier.create(1));
       vi.useFakeTimers();
       vi.advanceTimersByTime(100);
-      post.addCategoty(categoryId1);
+      post.addCategory(categoryId1);
 
       expect(post.categoryIds).toHaveLength(1);
       expect(post.categoryIds[0].equals(categoryId1)).toBeTruthy();
@@ -166,11 +166,11 @@ describe('Post Entity', () => {
       const post = Post.create(validProps, Identifier.create(1));
       vi.useFakeTimers();
       vi.advanceTimersByTime(100);
-      post.addCategoty(categoryId1);
+      post.addCategory(categoryId1);
       const firstUpdateTime = post._props.updated_at.getTime();
       vi.useFakeTimers();
       vi.advanceTimersByTime(100);
-      post.addCategoty(categoryId1);
+      post.addCategory(categoryId1);
 
       expect(post.categoryIds).toHaveLength(1);
       expect(post._props.updated_at.getTime()).toEqual(firstUpdateTime);

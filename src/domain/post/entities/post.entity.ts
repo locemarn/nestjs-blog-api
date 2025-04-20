@@ -121,7 +121,7 @@ export class Post extends BaseEntity<PostProps> {
     }
   }
 
-  public addCategoty(categoryId: Identifier): void {
+  public addCategory(categoryId: Identifier): void {
     if (!categoryId)
       throw new CategoryAssociationException(
         'Category ID cannot be null or undefined when adding.',

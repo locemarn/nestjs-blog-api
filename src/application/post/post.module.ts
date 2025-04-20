@@ -3,10 +3,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CreatePostCommandHandler } from './commands/create-post/create-post.handler';
 import { PostMapper } from './mappers/post.mapper';
 import { GetPostsQueryHandler } from './queries/get-posts/get-posts.handler';
+import { UpdatePostCommandHandler } from './commands/update-post/update-post.handler';
 
 export const PostCommandHandlers: Provider[] = [
   CreatePostCommandHandler,
-  // UpdatePostCommandHandler,
+  UpdatePostCommandHandler,
   // DeletePostCommandHandler,
   // PublishPostCommandHandler,
   // UnpublishPostCommandHandler,
