@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UnpublishPostCommandHandler } from './unpublish-post.handler';
 import { POST_REPOSITORY_TOKEN } from 'src/domain/post/repositories/post.repository.interface';
