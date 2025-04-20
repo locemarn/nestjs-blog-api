@@ -4,14 +4,16 @@ import { CreatePostCommandHandler } from './commands/create-post/create-post.han
 import { PostMapper } from './mappers/post.mapper';
 import { GetPostsQueryHandler } from './queries/get-posts/get-posts.handler';
 import { UpdatePostCommandHandler } from './commands/update-post/update-post.handler';
+import { DeletePostCommandHandler } from './commands/delete-post/delete-post.handler';
+import { PublishPostCommandHandler } from './commands/publish-post/publish-post.handler';
+import { UnpublishPostCommandHandler } from './commands/unpublish-post/unpublish-post.handler';
 
 export const PostCommandHandlers: Provider[] = [
   CreatePostCommandHandler,
   UpdatePostCommandHandler,
-  // DeletePostCommandHandler,
-  // PublishPostCommandHandler,
-  // UnpublishPostCommandHandler,
-  // Add other command handlers here
+  DeletePostCommandHandler,
+  PublishPostCommandHandler,
+  UnpublishPostCommandHandler,
 ];
 
 export const PostQueryHandlers: Provider[] = [
