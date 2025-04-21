@@ -32,15 +32,19 @@ export class CreatePostCommandHandler
     @Inject(POST_REPOSITORY_TOKEN)
     private readonly postRepository: IPostRepository,
     @Inject(USER_REPOSITORY_TOKEN) private readonly userRepo: IUserRepository,
-    // private readonly eventBus: EventBus,
-    // private readonly queryBus: QueryBus,
-    @Inject('EventBus') // Use the literal string 'QueryBus'
     private readonly eventBus: EventBus,
-    @Inject('QueryBus') // Use the literal string 'QueryBus'
     private readonly queryBus: QueryBus,
     @Inject(POST_MAPPER_TOKEN)
     private readonly postMapper: PostMapper,
-  ) {}
+  ) {
+    // Optional: Add constructor logs
+    console.log(
+      `CreatePostCommandHandler constructor: EventBus injected? ${!!this.eventBus}`,
+    );
+    console.log(
+      `CreatePostCommandHandler constructor: QueryBus injected? ${!!this.queryBus}`,
+    );
+  }
 
   async execute(command: CreatePostCommand): Promise<CreatePostOutputDto> {
     const {
@@ -81,6 +85,8 @@ export class CreatePostCommandHandler
 
     // 5. Publish Domain Events
     await savedPost.publishEvents(this.eventBus);
+
+    console.log('queryBus --->', this.queryBus);
 
     // 6 . Map to Output DTO
     const resultDto = await this.queryBus.execute<

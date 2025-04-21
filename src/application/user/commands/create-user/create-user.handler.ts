@@ -1,4 +1,9 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import {
+  CommandHandler,
+  EventBus,
+  ICommandHandler,
+  QueryBus,
+} from '@nestjs/cqrs';
 import { CreateUserCommand } from './create-user.command';
 import { CreateUserOutputDto } from './create-user.dto';
 import { Inject } from '@nestjs/common';
@@ -23,6 +28,8 @@ export class CreateUserCommandHandler
     private readonly userRepository: IUserRepository,
     @Inject(PASSWORD_HASHER_TOKEN)
     private readonly passwordHasher: IPasswordHasher,
+    private readonly eventBus: EventBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<CreateUserOutputDto> {

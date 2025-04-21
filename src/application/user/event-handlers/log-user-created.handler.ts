@@ -9,7 +9,7 @@ export class LogUserCreatedHandler implements IEventHandler<UserCreatedEvent> {
 
   handle(event: UserCreatedEvent) {
     this.logger.log(
-      `User Created - ID: ${event.aggregateId}, Occurred: ${event.occurredOn}`,
+      `User Created - ID: ${event.aggregateId}, Occurred: ${event.occurredOn.toISOString()}`,
     );
     // Add more complex logic here, e.g.:
     // - Send welcome email

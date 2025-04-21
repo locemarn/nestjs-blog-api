@@ -30,7 +30,19 @@ type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User!
 }
 
+type Post {
+  authorId: ID!
+  cateforyIds: [ID!]!
+  content: String!
+  created_at: DateTime!
+  id: ID!
+  published: Boolean!
+  title: String!
+  updated_at: DateTime!
+}
+
 type Query {
+  postById(id: ID!): Post
   userByEmail(email: String!): User
   userById(id: ID!): User
 }

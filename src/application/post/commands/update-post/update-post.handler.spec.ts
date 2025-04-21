@@ -11,6 +11,7 @@ import { POST_MAPPER_TOKEN } from '../../mappers/post.mapper';
 import { UpdatePostCommand } from './update-post.command';
 import { UpdatePostInputDto } from './update-post.dto';
 import { PostNotFoundException } from 'src/domain/post/exceptions/post.exceptions';
+import { EventBus, QueryBus } from '@nestjs/cqrs';
 
 // --- Mocks ---
 const mockPostRepository = {
@@ -73,16 +74,16 @@ describe('UpdatePostHandler', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         UpdatePostCommandHandler,
-        { provide: 'EventBus', useValue: mockEventBus },
-        { provide: 'QueryBus', useValue: mockQueryBus },
+        { provide: EventBus, useValue: mockEventBus },
+        { provide: QueryBus, useValue: mockQueryBus },
         { provide: POST_REPOSITORY_TOKEN, useValue: mockPostRepository },
         { provide: POST_MAPPER_TOKEN, useValue: mockPostMapper },
       ],
     }).compile();
     handler = moduleRef.get<UpdatePostCommandHandler>(UpdatePostCommandHandler);
     // repository = moduleRef.get<IPostRepository>(POST_REPOSITORY_TOKEN);
-    // eventBus = moduleRef.get<EventBus>('EventBus');
-    // queryBus = moduleRef.get<QueryBus>('QueryBus');
+    // eventBus = moduleRef.get<EventBus>(EventBus);
+    // queryBus = moduleRef.get<QueryBus>(QueryBus);
     // postMapper = moduleRef.get<PostMapper>(POST_MAPPER_TOKEN);
   });
 

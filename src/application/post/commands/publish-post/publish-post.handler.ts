@@ -24,7 +24,7 @@ export class PublishPostCommandHandler
     @Inject(POST_REPOSITORY_TOKEN)
     private readonly postRepository: IPostRepository,
     private readonly eventBus: EventBus,
-    @Inject('QueryBus')
+    // @Inject('QueryBus')
     private readonly queryBus: QueryBus,
   ) {}
   async execute(command: PublishPostCommand): Promise<PublishPostOutputDto> {

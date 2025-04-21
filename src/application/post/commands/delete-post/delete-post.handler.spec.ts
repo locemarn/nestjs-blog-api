@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import 'reflect-metadata';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DeletePostCommandHandler } from './delete-post.handler';
 import {
@@ -50,13 +51,13 @@ describe('DeletePostCommandHandler', () => {
           provide: POST_REPOSITORY_TOKEN,
           useValue: mockPostRepository,
         },
-        { provide: 'EventBus', useValue: mockEventBus },
+        { provide: EventBus, useValue: mockEventBus },
       ],
     }).compile();
 
     handler = moduleRef.get<DeletePostCommandHandler>(DeletePostCommandHandler);
     repository = moduleRef.get<IPostRepository>(POST_REPOSITORY_TOKEN);
-    eventBus = moduleRef.get<EventBus>('EventBus');
+    eventBus = moduleRef.get<EventBus>(EventBus);
   });
 
   it('should delete post and publish event successfully', async () => {

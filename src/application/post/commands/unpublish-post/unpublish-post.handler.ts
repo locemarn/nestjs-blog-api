@@ -24,9 +24,12 @@ export class UnpublishPostCommandHandler
     @Inject(POST_REPOSITORY_TOKEN)
     private readonly postRepository: IPostRepository,
     private readonly eventBus: EventBus,
-    @Inject('QueryBus')
+    // @Inject(QueryBus)
     private readonly queryBus: QueryBus,
-  ) {}
+  ) {
+    console.log('eventBus --->', eventBus);
+    console.log('queryBus', queryBus);
+  }
 
   async execute(
     command: UnpublishPostCommand,

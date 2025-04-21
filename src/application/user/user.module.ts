@@ -9,7 +9,7 @@ import { GetUserByEmailQueryHandler } from './queries/get-user-by-email/get-user
 import { LogUserCreatedHandler } from './event-handlers/log-user-created.handler';
 import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UserMapper } from './mappers/user.mapper';
+import { USER_MAPPER_TOKEN, UserMapper } from './mappers/user.mapper';
 import { InfrastructureModule } from 'src/infrastructure/infrastructure.module';
 
 export const UserCommandHandlers: Provider[] = [
@@ -29,6 +29,7 @@ export const UserEventHandlers: Provider[] = [LogUserCreatedHandler];
   imports: [CqrsModule, InfrastructureModule],
   providers: [
     UserMapper,
+    { provide: USER_MAPPER_TOKEN, useExisting: UserMapper },
     ...UserCommandHandlers,
     ...UserQueryHandlers,
     ...UserEventHandlers,

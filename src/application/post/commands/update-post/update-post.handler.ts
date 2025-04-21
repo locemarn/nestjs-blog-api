@@ -26,9 +26,9 @@ export class UpdatePostCommandHandler
   constructor(
     @Inject(POST_REPOSITORY_TOKEN)
     private readonly postRepository: IPostRepository,
-    @Inject('QueryBus')
+    @Inject(QueryBus)
     private readonly queryBus: QueryBus,
-    @Inject('EventBus')
+    @Inject(EventBus)
     private readonly eventBus: EventBus,
     @Inject(POST_MAPPER_TOKEN)
     private readonly postMapper: PostMapper,
