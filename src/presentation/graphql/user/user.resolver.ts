@@ -151,6 +151,7 @@ export class UserResolver {
   }
 
   @Mutation(() => DeleteUserPayload, { description: 'Delete a user by ID.' })
+  @UseGuards(JwtAuthGuard)
   async deleteUser(@Args() args: DeleteUserArgs): Promise<DeleteUserPayload> {
     this.logger.log(`Received deleteUser mutation for ID: ${args.id}`);
     try {
