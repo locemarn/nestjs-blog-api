@@ -12,7 +12,7 @@
 // import { Post } from 'src/domain/post/entities/post.entity';
 // import { execSync } from 'child_process';
 
-import { describe, it, expect } from 'vitest';
+import { expect, it } from 'vitest';
 
 // // --- Configuration & Helpers ---
 
@@ -169,56 +169,56 @@ import { describe, it, expect } from 'vitest';
 //     await prismaTestClient?.$disconnect();
 //   });
 
-//   // it('save() should CREATE a new post with categories', async () => {
-//   //   const user = await prismaTestClient.user.create({
-//   //     data: {
-//   //       email: `u-${randomUUID().toString().substring(0, 8).toString().substring(0, 10)}@test.com`,
-//   //       username: `u-${randomUUID().toString().substring(0, 8).toString().substring(0, 10)}`,
-//   //       password: 'p',
-//   //       role: 'USER',
-//   //     },
-//   //   });
+//   it('save() should CREATE a new post with categories', async () => {
+//     const user = await prismaTestClient.user.create({
+//       data: {
+//         email: `u-${randomUUID().toString().substring(0, 8).toString().substring(0, 10)}@test.com`,
+//         username: `u-${randomUUID().toString().substring(0, 8).toString().substring(0, 10)}`,
+//         password: 'p',
+//         role: 'USER',
+//       },
+//     });
 
-//   //   const cat1 = await prismaTestClient.category.create({
-//   //     data: {
-//   //       name: `Cat ${randomUUID().toString().substring(0, 8).toString().substring(0, 8)}`,
-//   //     },
-//   //   });
-//   //   const cat2 = await prismaTestClient.category.create({
-//   //     data: {
-//   //       name: `Cat ${randomUUID().toString().substring(0, 8).toString().substring(0, 8)}`,
-//   //     },
-//   //   });
-//   //   const authorId = Identifier.create(user.id);
-//   //   const catId1 = Identifier.create(cat1.id);
-//   //   const catId2 = Identifier.create(cat2.id);
+//     const cat1 = await prismaTestClient.category.create({
+//       data: {
+//         name: `Cat ${randomUUID().toString().substring(0, 8).toString().substring(0, 8)}`,
+//       },
+//     });
+//     const cat2 = await prismaTestClient.category.create({
+//       data: {
+//         name: `Cat ${randomUUID().toString().substring(0, 8).toString().substring(0, 8)}`,
+//       },
+//     });
+//     const authorId = Identifier.create(user.id);
+//     const catId1 = Identifier.create(cat1.id);
+//     const catId2 = Identifier.create(cat2.id);
 
-//   //   const postData = generateUniquePostData(authorId, [catId1, catId2]);
-//   //   const postDomainEntity = Post.create(postData);
+//     const postData = generateUniquePostData(authorId, [catId1, catId2]);
+//     const postDomainEntity = Post.create(postData);
 
-//   //   // Act
-//   //   const savedPost = await repository.save(postDomainEntity);
+//     // Act
+//     const savedPost = await repository.save(postDomainEntity);
 
-//   //   // Assert Domain Object
-//   //   expect(savedPost.id.Value).toBeGreaterThan(0);
-//   //   expect(savedPost.title.Value).toBe(postData.title.Value);
-//   //   expect(savedPost.authorId.equals(authorId)).toBeTruthy();
-//   //   expect(savedPost.categoryIds).toHaveLength(2);
-//   //   expect(savedPost.categoryIds.some((id) => id.equals(catId1))).toBeTruthy();
-//   //   expect(savedPost.categoryIds.some((id) => id.equals(catId2))).toBeTruthy();
+//     // Assert Domain Object
+//     expect(savedPost.id.Value).toBeGreaterThan(0);
+//     expect(savedPost.title.Value).toBe(postData.title.Value);
+//     expect(savedPost.authorId.equals(authorId)).toBeTruthy();
+//     expect(savedPost.categoryIds).toHaveLength(2);
+//     expect(savedPost.categoryIds.some((id) => id.equals(catId1))).toBeTruthy();
+//     expect(savedPost.categoryIds.some((id) => id.equals(catId2))).toBeTruthy();
 
-//   //   // Assert Database State
-//   //   const dbPost = await prismaTestClient.post.findUnique({
-//   //     where: { id: savedPost.id.Value as number },
-//   //     include: { categories: { select: { id: true } } },
-//   //   });
-//   //   expect(dbPost).toBeDefined();
-//   //   expect(dbPost?.userId).toBe(user.id);
-//   //   expect(dbPost?.categories).toHaveLength(2);
-//   //   expect(dbPost?.categories.map((c) => c.id).sort()).toEqual(
-//   //     [cat1.id, cat2.id].sort(),
-//   //   );
-//   // });
+//     // Assert Database State
+//     const dbPost = await prismaTestClient.post.findUnique({
+//       where: { id: savedPost.id.Value as number },
+//       include: { categories: { select: { id: true } } },
+//     });
+//     expect(dbPost).toBeDefined();
+//     expect(dbPost?.userId).toBe(user.id);
+//     expect(dbPost?.categories).toHaveLength(2);
+//     expect(dbPost?.categories.map((c) => c.id).sort()).toEqual(
+//       [cat1.id, cat2.id].sort(),
+//     );
+//   });
 
 //   it('save() should UPDATE an existing post, changing categories', async () => {
 //     // Arrange: Create user, categories, and initial post
@@ -230,6 +230,12 @@ import { describe, it, expect } from 'vitest';
 //         role: 'USER',
 //       },
 //     });
+//     // --- ADD LOGS TO VERIFY USER CREATION ---
+//     console.log('TEST UPDATE: User created with ID:', user?.id); // Log the user ID
+//     if (!user?.id) {
+//       console.error('TEST UPDATE: FATAL - User ID is missing after creation!');
+//     }
+//     // --- END LOGS ---
 //     const cat1 = await prismaTestClient.category.create({
 //       data: {
 //         name: `Cat ${randomUUID().toString().substring(0, 8).toString().substring(0, 8)}`,
@@ -250,6 +256,13 @@ import { describe, it, expect } from 'vitest';
 //     const catId2 = Identifier.create(cat2.id);
 //     const catId3 = Identifier.create(cat3.id);
 
+//     // --- ADD LOG BEFORE POST CREATION ---
+//     console.log(
+//       'TEST UPDATE: Attempting to create initial post with userId:',
+//       user.id,
+//     );
+//     // --- END LOG ---
+
 //     const initialPost = await prismaTestClient.post.create({
 //       data: {
 //         title: 'Initial Update Title',
@@ -259,6 +272,13 @@ import { describe, it, expect } from 'vitest';
 //         categories: { connect: [{ id: cat1.id }, { id: cat2.id }] }, // Start with cat1, cat2
 //       },
 //     });
+
+//     // --- Log If Successful (won't be reached if error occurs) ---
+//     console.log(
+//       'TEST UPDATE: Initial post created successfully with ID:',
+//       initialPost.id,
+//     );
+//     // --- End Log ---
 //     const postId = Identifier.create(initialPost.id);
 
 //     // Create domain entity representing updated state (new title, remove cat1, add cat3)
@@ -291,6 +311,8 @@ import { describe, it, expect } from 'vitest';
 //       where: { id: initialPost.id },
 //       include: { categories: { select: { id: true } } },
 //     });
+
+//     console.log('dbPost --->', dbPost);
 //     expect(dbPost?.title).toBe('UPDATED Title');
 //     expect(dbPost?.published).toBe(true);
 //     expect(dbPost?.categories).toHaveLength(2);
@@ -299,47 +321,47 @@ import { describe, it, expect } from 'vitest';
 //     );
 //   });
 
-//   // it('findById should return post with correct category IDs', async () => {
-//   //   // Arrange: Create user, categories, and post with categories
-//   //   const user = await prismaTestClient.user.create({
-//   //     data: {
-//   //       /* ... */ email: `u-${randomUUID().toString().substring(0, 8)}@test.com`,
-//   //       username: `u-${randomUUID().toString().substring(0, 8)}`,
-//   //       password: 'p',
-//   //       role: 'USER',
-//   //     },
-//   //   });
-//   //   const cat1 = await prismaTestClient.category.create({
-//   //     data: {
-//   //       /* ... */ name: `Cat ${randomUUID().toString().substring(0, 8)}`,
-//   //     },
-//   //   });
-//   //   const cat2 = await prismaTestClient.category.create({
-//   //     data: {
-//   //       /* ... */ name: `Cat ${randomUUID().toString().substring(0, 8)}`,
-//   //     },
-//   //   });
-//   //   const post = await prismaTestClient.post.create({
-//   //     data: {
-//   //       /* ... */ title: 'FindMe',
-//   //       content: 'c',
-//   //       userId: user.id,
-//   //       categories: { connect: [{ id: cat1.id }, { id: cat2.id }] },
-//   //     },
-//   //   });
-//   //   const postId = Identifier.create(post.id);
-//   //   const catId1 = Identifier.create(cat1.id);
-//   //   const catId2 = Identifier.create(cat2.id);
+//   it('findById should return post with correct category IDs', async () => {
+//     // Arrange: Create user, categories, and post with categories
+//     const user = await prismaTestClient.user.create({
+//       data: {
+//         /* ... */ email: `u-${randomUUID().toString().substring(0, 8)}@test.com`,
+//         username: `u-${randomUUID().toString().substring(0, 8)}`,
+//         password: 'p',
+//         role: 'USER',
+//       },
+//     });
+//     const cat1 = await prismaTestClient.category.create({
+//       data: {
+//         /* ... */ name: `Cat ${randomUUID().toString().substring(0, 8)}`,
+//       },
+//     });
+//     const cat2 = await prismaTestClient.category.create({
+//       data: {
+//         /* ... */ name: `Cat ${randomUUID().toString().substring(0, 8)}`,
+//       },
+//     });
+//     const post = await prismaTestClient.post.create({
+//       data: {
+//         /* ... */ title: 'FindMe',
+//         content: 'c',
+//         userId: user.id,
+//         categories: { connect: [{ id: cat1.id }, { id: cat2.id }] },
+//       },
+//     });
+//     const postId = Identifier.create(post.id);
+//     const catId1 = Identifier.create(cat1.id);
+//     const catId2 = Identifier.create(cat2.id);
 
-//   //   // Act
-//   //   const foundPost = await repository.findById(postId);
+//     // Act
+//     const foundPost = await repository.findById(postId);
 
-//   //   // Assert
-//   //   expect(foundPost).not.toBeNull();
-//   //   expect(foundPost?.categoryIds).toHaveLength(2);
-//   //   expect(foundPost?.categoryIds.some((id) => id.equals(catId1))).toBe(true);
-//   //   expect(foundPost?.categoryIds.some((id) => id.equals(catId2))).toBe(true);
-//   // });
+//     // Assert
+//     expect(foundPost).not.toBeNull();
+//     expect(foundPost?.categoryIds).toHaveLength(2);
+//     expect(foundPost?.categoryIds.some((id) => id.equals(catId1))).toBe(true);
+//     expect(foundPost?.categoryIds.some((id) => id.equals(catId2))).toBe(true);
+//   });
 
 //   it('find should filter by published status', async () => {
 //     // Arrange: Create published and unpublished posts
@@ -416,62 +438,62 @@ import { describe, it, expect } from 'vitest';
 //     expect(user1Posts[0].authorId.Value).toBe(user1.id);
 //   });
 
-//   // it('find should filter by categoryId', async () => {
-//   //   // Arrange: Create categories and posts with different category links
-//   //   const user = await prismaTestClient.user.create({
-//   //     data: {
-//   //       /* ... */ email: `u-${randomUUID().toString().substring(0, 8)}@test.com`,
-//   //       username: `u-${randomUUID().toString().substring(0, 8)}`,
-//   //       password: 'p',
-//   //       role: 'USER',
-//   //     },
-//   //   });
-//   //   const catA = await prismaTestClient.category.create({
-//   //     data: {
-//   //       /* ... */ name: `CatA-${randomUUID().toString().substring(0, 8)}`,
-//   //     },
-//   //   });
-//   //   const catB = await prismaTestClient.category.create({
-//   //     data: {
-//   //       /* ... */ name: `CatB-${randomUUID().toString().substring(0, 8)}`,
-//   //     },
-//   //   });
-//   //   await prismaTestClient.post.create({
-//   //     data: {
-//   //       /* ... */ title: 'PostA',
-//   //       content: 'c',
-//   //       userId: user.id,
-//   //       categories: { connect: [{ id: catA.id }] },
-//   //     },
-//   //   });
-//   //   await prismaTestClient.post.create({
-//   //     data: {
-//   //       /* ... */ title: 'PostB',
-//   //       content: 'c',
-//   //       userId: user.id,
-//   //       categories: { connect: [{ id: catB.id }] },
-//   //     },
-//   //   });
-//   //   await prismaTestClient.post.create({
-//   //     data: {
-//   //       /* ... */ title: 'PostAB',
-//   //       content: 'c',
-//   //       userId: user.id,
-//   //       categories: { connect: [{ id: catA.id }, { id: catB.id }] },
-//   //     },
-//   //   });
+//   it('find should filter by categoryId', async () => {
+//     // Arrange: Create categories and posts with different category links
+//     const user = await prismaTestClient.user.create({
+//       data: {
+//         /* ... */ email: `u-${randomUUID().toString().substring(0, 8)}@test.com`,
+//         username: `u-${randomUUID().toString().substring(0, 8)}`,
+//         password: 'p',
+//         role: 'USER',
+//       },
+//     });
+//     const catA = await prismaTestClient.category.create({
+//       data: {
+//         /* ... */ name: `CatA-${randomUUID().toString().substring(0, 8)}`,
+//       },
+//     });
+//     const catB = await prismaTestClient.category.create({
+//       data: {
+//         /* ... */ name: `CatB-${randomUUID().toString().substring(0, 8)}`,
+//       },
+//     });
+//     await prismaTestClient.post.create({
+//       data: {
+//         /* ... */ title: 'PostA',
+//         content: 'c',
+//         userId: user.id,
+//         categories: { connect: [{ id: catA.id }] },
+//       },
+//     });
+//     await prismaTestClient.post.create({
+//       data: {
+//         /* ... */ title: 'PostB',
+//         content: 'c',
+//         userId: user.id,
+//         categories: { connect: [{ id: catB.id }] },
+//       },
+//     });
+//     await prismaTestClient.post.create({
+//       data: {
+//         /* ... */ title: 'PostAB',
+//         content: 'c',
+//         userId: user.id,
+//         categories: { connect: [{ id: catA.id }, { id: catB.id }] },
+//       },
+//     });
 
-//   //   // Act
-//   //   const catAPosts = await repository.find({
-//   //     categoryId: Identifier.create(catA.id),
-//   //   });
+//     // Act
+//     const catAPosts = await repository.find({
+//       categoryId: Identifier.create(catA.id),
+//     });
 
-//   //   // Assert
-//   //   // expect(catAPosts).toHaveLength(2); // PostA and PostAB
-//   //   expect(catAPosts.map((p) => p.title.Value).sort()).toEqual(
-//   //     ['PostA', 'PostAB'].sort(),
-//   //   );
-//   // });
+//     // Assert
+//     expect(catAPosts).toHaveLength(2); // PostA and PostAB
+//     expect(catAPosts.map((p) => p.title.Value).sort()).toEqual(
+//       ['PostA', 'PostAB'].sort(),
+//     );
+//   });
 
 //   it('count should return the total number matching filters', async () => {
 //     // Arrange: Create posts
@@ -518,8 +540,4 @@ import { describe, it, expect } from 'vitest';
 //   });
 // });
 
-describe('should', () => {
-  it('should work', () => {
-    expect(true).toBeTruthy();
-  });
-});
+it('work', () => expect(true).toBeTruthy());

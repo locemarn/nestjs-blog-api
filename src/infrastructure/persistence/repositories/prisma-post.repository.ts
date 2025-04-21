@@ -47,7 +47,7 @@ export class PrismaPostRepository {
       title: post.title.Value,
       content: post.content.Value,
       published: post.isPublished,
-      userId: post.authorId?.Value as number | undefined, // Map authorId
+      userId: post.authorId?.Value as number | undefined,
     };
   }
 
@@ -62,13 +62,26 @@ export class PrismaPostRepository {
   // --- Repository Methods ---
 
   async save(post: Post): Promise<Post> {
-    const basePersistenceData = this.mapBasePersistenceData(post);
-    const categoryConnectData = this.mapCategoryIdsForConnect(post.categoryIds);
-    let savedOrUpdatedPrismaPost: PrismaPost;
-
+    // const basePersistenceData = this.mapBasePersistenceData(post);
     const postIdValue = post.id?.Value;
     const isUpdate = postIdValue !== undefined && postIdValue !== 0;
+    const categoryConnectData = this.mapCategoryIdsForConnect(post.categoryIds);
 
+    const baseData = {
+      title: post.title.Value,
+      content: post.content.Value,
+      published: post.isPublished,
+      userId: post.authorId?.Value as number,
+    };
+
+    if (baseData.userId === undefined || baseData.userId === null) {
+      this.logger.error(
+        `Attempted to save post without a valid userId. Post ID (if exists): ${postIdValue}`,
+      );
+      throw new Error('Cannot save post without a valid author ID.');
+    }
+
+    let savedOrUpdatedPrismaPost: PrismaPost;
     try {
       if (isUpdate) {
         // --- UPDATE ---
@@ -80,12 +93,12 @@ export class PrismaPostRepository {
             const updatedPost = await tx.post.update({
               where: { id: idForWhere },
               data: {
-                ...basePersistenceData,
+                ...baseData,
                 updated_at: new Date(),
               },
             });
             await tx.post.update({
-              where: { id: +postIdValue },
+              where: { id: idForWhere },
               data: {
                 categories: {
                   set: categoryConnectData,
@@ -102,7 +115,7 @@ export class PrismaPostRepository {
         this.logger.debug(`Creating new post with title: ${post.title.Value}`);
         savedOrUpdatedPrismaPost = await this._prisma.post.create({
           data: {
-            ...basePersistenceData,
+            ...baseData,
             categories:
               categoryConnectData.length > 0
                 ? {
