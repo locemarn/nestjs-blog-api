@@ -15,16 +15,37 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DeletePostPayload {
+  success: Boolean!
+}
+
 type DeleteUserPayload {
   success: Boolean!
+}
+
+type GetPostsOutputDto {
+  hasMore: Boolean!
+  posts: [Post!]!
+  skip: Int!
+  take: Int!
+  total: Int!
 }
 
 type Mutation {
   """Create a new user account."""
   createUser(input: CreateUserInput!): User!
 
+  """Delete a post by ID."""
+  deletePost(id: ID!): DeletePostPayload!
+
   """Delete a user by ID."""
   deleteUser(id: ID!): DeleteUserPayload!
+
+  """Publish a draft post."""
+  publishPost(id: ID!): Post!
+
+  """Unpublish a post, making it a draft."""
+  unpublishPost(id: ID!): Post!
 
   """Update an existing user."""
   updateUser(id: ID!, input: UpdateUserInput!): User!
@@ -43,6 +64,9 @@ type Post {
 
 type Query {
   postById(id: ID!): Post
+
+  """Fetch a list of posts with optional filters and pagination."""
+  posts(authorId: ID, categoryId: ID, published: Boolean, skip: Int = 0, take: Int = 10): GetPostsOutputDto!
   userByEmail(email: String!): User
   userById(id: ID!): User
 }

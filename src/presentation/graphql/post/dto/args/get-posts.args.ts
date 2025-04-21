@@ -6,12 +6,12 @@ export class GetPostsArgs {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsNumber()
-  authorId?: number | string;
+  authorId?: number;
 
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsNumber()
-  categoryId?: number | string;
+  categoryId?: number;
 
   @Field({ nullable: true })
   @IsOptional()
