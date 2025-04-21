@@ -1,68 +1,72 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Category, CategoryProps } from './category.entity';
+import { CategoryName } from '../value-objects/category-name.vo';
+import { CategoryCreatedEvent } from '../events/category-created.event';
+import { Identifier } from 'src/domain/shared/identifier';
+import { CategoryUpdatedEvent } from '../events/category-updated.event';
 
 describe('Category Entity', () => {
-  let minimalValueProps: CategoryProps;
+  let validProps: CategoryProps;
 
   beforeEach(() => {
-    minimalValueProps = {
-      name: 'Category 1',
+    validProps = {
+      name: CategoryName.create('Category 1'),
     };
   });
 
   it('should create a new category', () => {
-    const category = Category.create(minimalValueProps);
+    const category = Category.create(validProps);
     expect(category).toBeInstanceOf(Category);
-  });
-
-  it('should throw an error if category name is not provide or has less then 3 chars', () => {
-    expect(() =>
-      Category.create({
-        ...minimalValueProps,
-        name: null as unknown as string,
-      }),
-    ).toThrow('Category name is required');
-
-    expect(() =>
-      Category.create({
-        ...minimalValueProps,
-        name: '',
-      }),
-    ).toThrow('Category name is required');
-  });
-
-  it('should throw an error if the lenght of category name is more than 50', () => {
-    expect(() =>
-      Category.create({
-        ...minimalValueProps,
-        name: 'a'.repeat(51),
-      }),
-    ).toThrow('Category name lenght is too long');
-  });
-
-  it('should update category name', () => {
-    const category = Category.create(minimalValueProps);
-    category.updateName('updated category');
-    expect(category.name).not.toEqual(minimalValueProps.name);
-    expect(category.name).toBe('updated category');
-  });
-
-  it('should throw an error if update category name is empty or value has less than 3 chars', () => {
-    const category = Category.create(minimalValueProps);
-
-    expect(() => category.updateName(null as unknown as string)).toThrow(
-      'Category name is required',
-    );
-
-    expect(() => category.updateName(null as unknown as string)).toThrow(
-      'Category name is required',
+    expect(category.id.Value).toBe(0);
+    expect(category.name.Value).toBe('Category 1');
+    expect(category.domainEvents).toHaveLength(1);
+    expect(category.domainEvents[0]).toBeInstanceOf(CategoryCreatedEvent);
+    expect((category.domainEvents[0] as CategoryCreatedEvent).name).toBe(
+      'Category 1',
     );
   });
 
-  it('should throw an error if update category name value has more than 50 chars', () => {
-    const category = Category.create(minimalValueProps);
-    expect(() => category.updateName('a'.repeat(51))).toThrow(
-      'Category name length is too long',
-    );
+  it('should create a category with a specific ID', () => {
+    const categoryId = Identifier.create(50);
+    const category = Category.create(validProps, categoryId);
+
+    expect(category.id.equals(categoryId)).toBeTruthy();
+    expect(category.domainEvents).toHaveLength(0);
+  });
+
+  it('should a throw if name is not provide', () => {
+    const props = { name: null as any };
+    expect(() => Category.create(props)).toThrow('Category name is required');
+  });
+
+  it('should allow update the name', () => {
+    const category = Category.create(validProps, Identifier.create(1));
+    const oldName = category.name;
+    const newName = CategoryName.create('Software Development');
+    category.updateName(newName);
+
+    expect(category.name.equals(newName)).toBeTruthy();
+    expect(category.domainEvents).toHaveLength(1);
+    expect(category.domainEvents[0]).toBeInstanceOf(CategoryUpdatedEvent);
+    const event = category.domainEvents[0] as CategoryUpdatedEvent;
+    expect(event.newName).toBe(newName.Value);
+    expect(event.oldName).toBe(oldName.Value);
+  });
+
+  it('should throw when updating name to an invalid value', () => {
+    const category = Category.create(validProps, Identifier.create(1));
+    expect(() =>
+      category.updateName(CategoryName.create('a'.repeat(60))),
+    ).toThrow('Category name must be between 2 and 50 characters.');
+  });
+
+  it('should not add update event if name is unchanged', () => {
+    const category = Category.create(validProps, Identifier.create(1));
+    category.clearEvents();
+
+    category.updateName(validProps.name);
+
+    expect(category.domainEvents.length).toBe(0);
   });
 });
