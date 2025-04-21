@@ -22,9 +22,9 @@ export class CreatePostInput {
   @IsString()
   content: string;
 
-  @Field(() => ID)
-  @IsNumber()
-  authorId: string;
+  // @Field(() => ID)
+  // @IsNumber()
+  // authorId: string;
 
   @Field(() => [ID], {
     nullable: true,

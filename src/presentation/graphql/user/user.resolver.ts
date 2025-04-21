@@ -1,6 +1,6 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 
 // GraphQL Types, Inputs, Args, Payloads
 import { UserType } from './dto/types/user.type';
@@ -23,6 +23,7 @@ import { UserOutputDto } from 'src/application/user/queries/get-user-by-id/get-u
 import { CreateUserOutputDto } from 'src/application/user/commands/create-user/create-user.dto';
 import { UpdateUserOutputDto } from 'src/application/user/commands/update-user/update-user.dto';
 import { DeleteUserOutputDto } from 'src/application/user/commands/delete-user/delete-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -122,6 +123,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserType, { description: 'Update an existing user.' })
+  @UseGuards(JwtAuthGuard)
   async updateUser(
     @Args('id', { type: () => ID }) id: number,
     @Args('input') input: UpdateUserInput,

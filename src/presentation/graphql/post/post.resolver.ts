@@ -1,20 +1,33 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { PostType } from './dto/types/post.type';
-import { Logger } from '@nestjs/common';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Logger, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {
+  CurrentUser,
+  AuthenticatedUser,
+} from 'src/auth/decorators/current-user.decorator';
+
+// GraphQL DTOs
+import { PostType } from './dto/types/post.type';
 import { PostIdArgs } from './dto/args/post-id.args';
-import { PostOutputDto } from 'src/application/post/queries/get-post-by-id/get-post-by-id.dto';
-import { GetPostByIdQuery } from 'src/application/post/queries/get-post-by-id/get-post-by-id.query';
 import { GetPostsArgs } from './dto/args/get-posts.args';
-import { GetPostsOutputDto } from 'src/application/post/queries/get-posts/get-posts.dto';
-import { GetPostsQuery } from 'src/application/post/queries/get-posts/get-posts.query';
-import { DeletePostCommand } from 'src/application/post/commands/delete-post/delete-post.command';
-import { DeletePostOutputDto } from 'src/application/post/commands/delete-post/delete-post.dto';
-import { PublishPostCommand } from 'src/application/post/commands/publish-post/publish-post.command';
-import { UnpublishPostCommand } from 'src/application/post/commands/unpublish-post/unpublish-post.command';
 import { DeletePostPayload } from './dto/types/delete-post.payload';
 import { CreatePostInput } from './dto/inputs/create-post.input';
+
+// Application Commands/Queries
+import { DeletePostCommand } from 'src/application/post/commands/delete-post/delete-post.command';
+import { PublishPostCommand } from 'src/application/post/commands/publish-post/publish-post.command';
+import { UnpublishPostCommand } from 'src/application/post/commands/unpublish-post/unpublish-post.command';
+import { UpdatePostCommand } from 'src/application/post/commands/update-post/update-post.command';
 import { CreatePostCommand } from 'src/application/post/commands/create-post/create-post.command';
+import { GetPostByIdQuery } from 'src/application/post/queries/get-post-by-id/get-post-by-id.query';
+import { GetPostsQuery } from 'src/application/post/queries/get-posts/get-posts.query';
+
+// Application Output DTOs
+import { PostOutputDto } from 'src/application/post/queries/get-post-by-id/get-post-by-id.dto';
+import { GetPostsOutputDto } from 'src/application/post/queries/get-posts/get-posts.dto';
+import { DeletePostOutputDto } from 'src/application/post/commands/delete-post/delete-post.dto';
+import { UpdatePostInput } from './dto/inputs/update-post.input';
 
 @Resolver(() => PostType)
 export class PostResolver {
@@ -45,30 +58,52 @@ export class PostResolver {
 
   // --- Mutations ---
 
-  // @Mutation(() => PostType, { description: 'Create a new post.' })
-  // // TODO: Add @UseGuards(JwtAuthGuard) later for authentication
-  // async createPost(
-  //   @Args('input') input: CreatePostInput,
-  //   // TODO: Get authorId from context: @CurrentUser() user: AuthenticatedUser
-  // ): Promise<PostOutputDto> {
-  //   // Return type matches Application Handler
-  //   this.logger.log(
-  //     `GraphQL: Received createPost mutation for Title: ${input.title}`,
-  //   );
-  //   // In a real app, get authorId from authenticated user context, not input
-  //   // const authorId = user.id;
-  //   const command = new CreatePostCommand({
-  //     ...input,
-  //     // authorId: authorId // Override input authorId with authenticated user ID
-  //   });
-  //   // Command handler returns the created PostOutputDto (after fetching it)
-  //   return this.commandBus.execute(command);
-  // }
+  @Mutation(() => PostType)
+  @UseGuards(JwtAuthGuard)
+  async createPost(
+    @Args('input') input: CreatePostInput,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<PostOutputDto> {
+    this.logger.log(
+      `GraphQL: Received createPost mutation from User ID: ${user.userId}`,
+    );
+    if (!user) {
+      // Should be caught by JwtAuthGuard, but double-check
+      throw new UnauthorizedException(
+        'Cannot create post without authentication.',
+      );
+    }
+    const command = new CreatePostCommand({
+      ...input,
+      authorId: user.userId,
+      categoryIds: input.categoryIds?.map((id) =>
+        typeof id === 'string' ? parseInt(id, 10) : id,
+      ),
+    });
+    return this.commandBus.execute(command);
+  }
+
+  @Mutation(() => PostType, { description: 'Update an existing post.' })
+  @UseGuards(JwtAuthGuard)
+  async updatePost(
+    @Args('id', { type: () => ID }) id: number | string,
+    @Args('input') input: UpdatePostInput,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<PostOutputDto> {
+    this.logger.log(
+      `GraphQL: Received updatePost mutation for ID: ${id} by User ID: ${user?.userId}`,
+    );
+    // Authorization check would go here (e.g., fetch post, check if user.userId === post.authorId)
+    // For now, just execute the command
+    const command = new UpdatePostCommand(+id, input);
+    return this.commandBus.execute(command);
+  }
 
   @Mutation(() => PostType, { description: 'Publish a draft post.' })
-  // TODO: Add @UseGuards(JwtAuthGuard) and potentially author/admin checks
+  @UseGuards(JwtAuthGuard)
   async publishPost(
-    @Args() args: PostIdArgs, // Use ArgsType for ID
+    @Args() args: PostIdArgs,
+    // @CurrentUser() user: AuthenticatedUser,
   ): Promise<PostOutputDto> {
     // Return type matches Application Handler
     this.logger.log(
@@ -82,9 +117,10 @@ export class PostResolver {
   @Mutation(() => PostType, {
     description: 'Unpublish a post, making it a draft.',
   })
-  // TODO: Add @UseGuards(JwtAuthGuard) and potentially author/admin checks
+  @UseGuards(JwtAuthGuard)
   async unpublishPost(
-    @Args() args: PostIdArgs, // Use ArgsType for ID
+    @Args() args: PostIdArgs,
+    // @CurrentUser() user: AuthenticatedUser,
   ): Promise<PostOutputDto> {
     // Return type matches Application Handler
     this.logger.log(
@@ -96,9 +132,10 @@ export class PostResolver {
   }
 
   @Mutation(() => DeletePostPayload, { description: 'Delete a post by ID.' })
-  // TODO: Add @UseGuards(JwtAuthGuard) and potentially author/admin checks
+  @UseGuards(JwtAuthGuard)
   async deletePost(
-    @Args() args: PostIdArgs, // Use ArgsType for ID
+    @Args() args: PostIdArgs,
+    // @CurrentUser() user: AuthenticatedUser,
   ): Promise<DeletePostOutputDto> {
     // Return type matches Application Handler
     this.logger.log(`GraphQL: Received deletePost mutation for ID: ${args.id}`);

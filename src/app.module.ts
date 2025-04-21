@@ -6,13 +6,21 @@ import { UserResolver } from './presentation/graphql/user/user.resolver';
 import { PostAppModule } from './application/post/post.module';
 import { PostResolver } from './presentation/graphql/post/post.resolver';
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      load: [],
+    }),
     CqrsModule.forRoot(),
     InfrastructureModule,
     UserAppModule,
     PostAppModule,
+    AuthModule,
     AppGraphQLModule,
   ],
   controllers: [],
