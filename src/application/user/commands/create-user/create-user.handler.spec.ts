@@ -13,6 +13,7 @@ import { Role, User } from 'src/domain/user/entities/user.entity';
 import { Identifier } from 'src/domain/shared/identifier';
 import { CreateUserCommand } from './create-user.command';
 import { EmailAlreadyExistsException } from '../../exceptions/email-already-exists.exception';
+import { EventBus, QueryBus } from '@nestjs/cqrs';
 
 // Mocks
 const mockUserRepository: Partial<IUserRepository> = {
@@ -26,21 +27,33 @@ const mockPasswordHasher: Partial<IPasswordHasher> = {
   hash: vi.fn(() => Promise.resolve('')),
 };
 
+const mockEventBus = {
+  publish: vi.fn(),
+  mergeObjectContext: vi.fn(<T>(entity: T): T => entity),
+};
+const mockQueryBus = { execute: vi.fn() };
+
 describe('CreateUserCommandHandler', () => {
   let handler: CreateUserCommandHandler;
+  let eventBus: EventBus;
+  let queryBus: QueryBus;
 
   beforeEach(async () => {
     vi.resetAllMocks();
 
-    const moduleRef = Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
       providers: [
         CreateUserCommandHandler,
         { provide: USER_REPOSITORY_TOKEN, useValue: mockUserRepository },
         { provide: PASSWORD_HASHER_TOKEN, useValue: mockPasswordHasher },
+        { provide: EventBus, useValue: mockEventBus },
+        { provide: QueryBus, useValue: mockQueryBus },
       ],
     }).compile();
 
-    handler = (await moduleRef).get(CreateUserCommandHandler);
+    handler = moduleRef.get(CreateUserCommandHandler);
+    eventBus = moduleRef.get(EventBus);
+    queryBus = moduleRef.get(QueryBus);
 
     // Mock implementation for successfuly case by default
     (mockPasswordHasher.hash as Mock).mockResolvedValue('hashed_password');

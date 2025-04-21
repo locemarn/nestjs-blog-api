@@ -6,11 +6,10 @@ import { USER_REPOSITORY_TOKEN } from 'src/domain/user/repositories/user.reposit
 import { PrismaUserRepository } from './persistence/repositories/prisma-user.repository';
 import { POST_REPOSITORY_TOKEN } from 'src/domain/post/repositories/post.repository.interface';
 import { PrismaPostRepository } from './persistence/repositories/prisma-post.repository';
-// --- We will import PrismaUserRepository HERE in the next step ---
-// import { PrismaUserRepository } from './persistence/repositories/prisma-user.repository';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, CqrsModule],
   providers: [
     {
       provide: PASSWORD_HASHER_TOKEN,
@@ -24,7 +23,6 @@ import { PrismaPostRepository } from './persistence/repositories/prisma-post.rep
       provide: POST_REPOSITORY_TOKEN,
       useClass: PrismaPostRepository,
     },
-    // Add providers for other repositories (Post, Comment, etc.) here later
   ],
   exports: [
     PASSWORD_HASHER_TOKEN,

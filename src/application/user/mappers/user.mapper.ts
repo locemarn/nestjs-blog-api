@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/domain/user/entities/user.entity';
 import { UserOutputDto } from '../queries/get-user-by-id/get-user-by-id.dto';
 
+export const USER_MAPPER_TOKEN = Symbol('UserMapper');
+
 @Injectable() // Make it injectable for dependency injection
 export class UserMapper {
   /**

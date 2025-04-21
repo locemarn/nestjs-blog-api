@@ -20,7 +20,7 @@ export class DeletePostCommandHandler
     @Inject(POST_REPOSITORY_TOKEN)
     private readonly postRepository: IPostRepository,
     // private readonly eventBus: EventBus,
-    @Inject('EventBus')
+    @Inject(EventBus)
     private readonly eventBus: EventBus,
   ) {}
 
