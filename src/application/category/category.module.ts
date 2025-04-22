@@ -7,9 +7,13 @@ import {
 import { CreateCategoryCommandHandler } from './commands/create-category/create-category.handler';
 import { GetAllCategoriesQueryHandler } from './queries/get-all-categories/get-all-categories.handler';
 import { GetCategoryByIdQueryHandler } from './queries/get-category-by-id/get-category-by-id.handler';
+import { UpdateCategoryCommandHandler } from './commands/update-category/update-category.handler';
+import { DeleteCategoryCommandHandler } from './commands/delete-category/delete-category.handler';
 
 export const CategoryCommandHandlers: Provider[] = [
-  CreateCategoryCommandHandler /* Update, Delete */,
+  CreateCategoryCommandHandler,
+  UpdateCategoryCommandHandler,
+  DeleteCategoryCommandHandler,
 ];
 
 export const CategoryQueryHandlers: Provider[] = [

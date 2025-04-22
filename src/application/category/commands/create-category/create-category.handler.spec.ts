@@ -51,10 +51,12 @@ describe('CreateCategoryCommandHandler', () => {
   const expectedOutputDto: CategoryOutputDto = { id: 1, name: categoryName };
   beforeEach(async () => {
     vi.resetAllMocks();
+
     // Reset spy
     vi.spyOn(mockSavedCategoryEntity, 'publishEvents').mockResolvedValue(
       undefined,
     );
+
     moduleRef = await Test.createTestingModule({
       imports: [CqrsModule],
       providers: [
