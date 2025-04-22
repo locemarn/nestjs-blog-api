@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { CqrsModule, EventBus, QueryBus } from '@nestjs/cqrs';
+import { CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   CATEGORY_REPOSITORY_TOKEN,
   ICategoryRepository,
 } from 'src/domain/category/repositories/category.repository.interface';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import {
-  CATEGORY_MAPPER_TOKEN,
-  CategoryMapper,
-} from '../../mappers/category.mapper';
+import { CATEGORY_MAPPER_TOKEN } from '../../mappers/category.mapper';
 import { GetCategoryByIdQueryHandler } from './get-category-by-id.handler';
 import { DeepMockProxy, mockDeep } from 'vitest-mock-extended';
 import { Category } from 'src/domain/category/entities/category.entity';
