@@ -22,7 +22,7 @@ import { CategoryAppModule } from './application/category/category.module';
     UserAppModule,
     PostAppModule,
     AuthModule,
-    // CategoryAppModule,
+    CategoryAppModule,
     AppGraphQLModule,
   ],
   controllers: [],

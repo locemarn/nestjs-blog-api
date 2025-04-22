@@ -12,10 +12,6 @@ import {
   CATEGORY_REPOSITORY_TOKEN,
   ICategoryRepository,
 } from 'src/domain/category/repositories/category.repository.interface';
-import {
-  CATEGORY_MAPPER_TOKEN,
-  CategoryMapper,
-} from '../../mappers/category.mapper';
 import { CategoryName } from 'src/domain/category/value-objects/category-name.vo';
 import { AppCategoryNameAlreadyExistsException } from '../../exceptions/category-app.exception';
 import { Category } from 'src/domain/category/entities/category.entity';
@@ -32,8 +28,6 @@ export class CreateCategoryCommandHandler
     private readonly eventBus: EventBus,
     @Inject(QueryBus)
     private readonly queryBus: QueryBus,
-    @Inject(CATEGORY_MAPPER_TOKEN)
-    private readonly categoryMapper: CategoryMapper,
   ) {}
 
   async execute(command: CreateCategoryCommand): Promise<CategoryOutputDto> {
