@@ -24,6 +24,9 @@ import { CreateUserOutputDto } from 'src/application/user/commands/create-user/c
 import { UpdateUserOutputDto } from 'src/application/user/commands/update-user/update-user.dto';
 import { DeleteUserOutputDto } from 'src/application/user/commands/delete-user/delete-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/domain/user/entities/user.entity';
+import { Roles } from 'src/auth/decorators/current-user.decorator';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -140,7 +143,6 @@ export class UserResolver {
 
       return updatedUser as unknown as UserOutputDto;
     } catch (error) {
-      console.error('cai aki?');
       const err = error as Error;
       this.logger.error(
         `Error in updateUser mutation for ID ${id}: ${err.message}`,
@@ -151,7 +153,8 @@ export class UserResolver {
   }
 
   @Mutation(() => DeleteUserPayload, { description: 'Delete a user by ID.' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async deleteUser(@Args() args: DeleteUserArgs): Promise<DeleteUserPayload> {
     this.logger.log(`Received deleteUser mutation for ID: ${args.id}`);
     try {

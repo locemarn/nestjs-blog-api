@@ -5,6 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import {
   CurrentUser,
   AuthenticatedUser,
+  Roles,
 } from 'src/auth/decorators/current-user.decorator';
 
 // GraphQL DTOs
@@ -28,6 +29,8 @@ import { PostOutputDto } from 'src/application/post/queries/get-post-by-id/get-p
 import { GetPostsOutputDto } from 'src/application/post/queries/get-posts/get-posts.dto';
 import { DeletePostOutputDto } from 'src/application/post/commands/delete-post/delete-post.dto';
 import { UpdatePostInput } from './dto/inputs/update-post.input';
+import { Role } from 'src/domain/user/entities/user.entity';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Resolver(() => PostType)
 export class PostResolver {
@@ -56,10 +59,11 @@ export class PostResolver {
     return this.queryBus.execute(new GetPostsQuery(args));
   }
 
-  // --- Mutations ---
+  // --- Mutations (Protected by Role) ---
 
   @Mutation(() => PostType)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async createPost(
     @Args('input') input: CreatePostInput,
     @CurrentUser() user: AuthenticatedUser,
@@ -84,7 +88,8 @@ export class PostResolver {
   }
 
   @Mutation(() => PostType, { description: 'Update an existing post.' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async updatePost(
     @Args('id', { type: () => ID }) id: number,
     @Args('input') input: UpdatePostInput,
@@ -101,7 +106,8 @@ export class PostResolver {
   }
 
   @Mutation(() => PostType, { description: 'Publish a draft post.' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async publishPost(
     @Args() args: PostIdArgs,
     // @CurrentUser() user: AuthenticatedUser,
@@ -118,7 +124,8 @@ export class PostResolver {
   @Mutation(() => PostType, {
     description: 'Unpublish a post, making it a draft.',
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async unpublishPost(
     @Args() args: PostIdArgs,
     // @CurrentUser() user: AuthenticatedUser,
@@ -133,7 +140,8 @@ export class PostResolver {
   }
 
   @Mutation(() => DeletePostPayload, { description: 'Delete a post by ID.' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async deletePost(
     @Args() args: PostIdArgs,
     // @CurrentUser() user: AuthenticatedUser,
