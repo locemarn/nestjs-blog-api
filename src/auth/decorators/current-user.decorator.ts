@@ -1,6 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Role } from 'src/domain/user/entities/user.entity';
+import { SetMetadata } from '@nestjs/common';
+
+export const ROLES_KEY = 'roles';
 
 // Define the shape of the user object attached by JwtStrategy.validate
 // Matches the return value of validate() in jwt.strategy.ts
@@ -19,3 +22,10 @@ export const CurrentUser = createParamDecorator(
     return req.user;
   },
 );
+
+/**
+ * Custom decorator to assign required roles to a route handler or class.
+ * Example: @Roles(Role.ADMIN, Role.EDITOR)
+ * @param roles One or more Role enum values required for access.
+ */
+export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);

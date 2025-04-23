@@ -9,11 +9,12 @@ import { AuthResolver } from './auth.resolver';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { RolesGuard } from './guards/roles.guard';
 
 const STRATEGIES: Provider[] = [LocalStrategy, JwtStrategy];
-const GUARDS: Provider[] = [];
 const RESOLVERS: Provider[] = [AuthResolver];
 const SERVICES: Provider[] = [AuthService];
+const GUARDS: Provider[] = [RolesGuard];
 
 @Module({
   imports: [

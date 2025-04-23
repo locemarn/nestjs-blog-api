@@ -15,6 +15,9 @@ import { DeleteCategoryOutputDto } from 'src/application/category/commands/delet
 import { UpdateCategoryCommand } from 'src/application/category/commands/update-category/update-category.command';
 import { UpdateCategoryInput } from './dto/inputs/update-category.input';
 import { DeleteCategoryPayload } from './dto/types/delete-category.payload';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/domain/user/entities/user.entity';
+import { Roles } from 'src/auth/decorators/current-user.decorator';
 
 // TODO: Define AdminGuard or similar for authorization later
 
@@ -54,11 +57,11 @@ export class CategoryResolver {
     return this.queryBus.execute(new GetAllCategoriesQuery());
   }
 
-  // --- Mutations ---
+  // --- Mutations (Protected by Role) ---
 
   @Mutation(() => CategoryType, { description: 'Create a new category.' })
-  @UseGuards(JwtAuthGuard) // Assume category creation requires auth (e.g., admin role)
-  // TODO: Add AdminGuard or RoleGuard for authorization
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async createCategory(
     @Args('input') input: CreateCategoryInput,
     // @CurrentUser() user: AuthenticatedUser // Inject user if needed for logging/authz
@@ -76,8 +79,8 @@ export class CategoryResolver {
   @Mutation(() => CategoryType, {
     description: 'Update an existing category name.',
   })
-  @UseGuards(JwtAuthGuard) // Assume category update requires auth
-  // TODO: Add AdminGuard or RoleGuard for authorization
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async updateCategory(
     @Args('id', { type: () => ID }) id: number,
     @Args('input') input: UpdateCategoryInput,
@@ -93,8 +96,8 @@ export class CategoryResolver {
   @Mutation(() => DeleteCategoryPayload, {
     description: 'Delete a category by ID.',
   })
-  @UseGuards(JwtAuthGuard) // Assume category deletion requires auth
-  // TODO: Add AdminGuard or RoleGuard for authorization
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async deleteCategory(
     @Args() args: CategoryIdArgs, // Use ArgsType class
     // @CurrentUser() user: AuthenticatedUser
