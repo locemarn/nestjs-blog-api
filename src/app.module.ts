@@ -8,6 +8,7 @@ import { PostResolver } from './presentation/graphql/post/post.resolver';
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { CategoryAppModule } from './application/category/category.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
     UserAppModule,
     PostAppModule,
     AuthModule,
+    CategoryAppModule,
     AppGraphQLModule,
   ],
   controllers: [],

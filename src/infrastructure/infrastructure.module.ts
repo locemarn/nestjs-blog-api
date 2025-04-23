@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { PrismaModule } from './persistence/prisma/prisma.module'; // Needed to make PrismaService globally available
 import { BcryptPasswordHasher } from './hashing/bcrypt-password-hasher';
 import { PASSWORD_HASHER_TOKEN } from 'src/application/user/shared/interfaces/password-hasher.interface';
@@ -7,7 +7,9 @@ import { PrismaUserRepository } from './persistence/repositories/prisma-user.rep
 import { POST_REPOSITORY_TOKEN } from 'src/domain/post/repositories/post.repository.interface';
 import { PrismaPostRepository } from './persistence/repositories/prisma-post.repository';
 import { CqrsModule } from '@nestjs/cqrs';
+import { CATEGORY_REPOSITORY_TOKEN } from 'src/domain/category/repositories/category.repository.interface';
 
+@Global()
 @Module({
   imports: [PrismaModule, CqrsModule],
   providers: [
@@ -23,11 +25,25 @@ import { CqrsModule } from '@nestjs/cqrs';
       provide: POST_REPOSITORY_TOKEN,
       useClass: PrismaPostRepository,
     },
+    {
+      provide: CATEGORY_REPOSITORY_TOKEN,
+      // Use a temporary placeholder mock until PrismaCategoryRepository exists
+      useValue: {
+        save: (cat) => cat as unknown,
+        findById: () => null,
+        findByName: () => null,
+        findManyByIds: () => [],
+        findAll: () => [],
+        delete: () => false,
+      },
+      // useClass: PrismaCategoryRepository, // <-- Use this once implemented
+    },
   ],
   exports: [
     PASSWORD_HASHER_TOKEN,
     USER_REPOSITORY_TOKEN,
     POST_REPOSITORY_TOKEN,
+    CATEGORY_REPOSITORY_TOKEN,
   ],
 })
 export class InfrastructureModule {}
