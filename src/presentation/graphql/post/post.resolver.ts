@@ -86,10 +86,11 @@ export class PostResolver {
   @Mutation(() => PostType, { description: 'Update an existing post.' })
   @UseGuards(JwtAuthGuard)
   async updatePost(
-    @Args('id', { type: () => ID }) id: number | string,
+    @Args('id', { type: () => ID }) id: number,
     @Args('input') input: UpdatePostInput,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<PostOutputDto> {
+    console.log('input --->', input);
     this.logger.log(
       `GraphQL: Received updatePost mutation for ID: ${id} by User ID: ${user?.userId}`,
     );

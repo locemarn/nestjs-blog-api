@@ -9,6 +9,7 @@ import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CategoryAppModule } from './application/category/category.module';
+import { CategoryResolver } from './presentation/graphql/category/category.resolver';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { CategoryAppModule } from './application/category/category.module';
     AppGraphQLModule,
   ],
   controllers: [],
-  providers: [Logger, UserResolver, PostResolver],
+  providers: [Logger, UserResolver, PostResolver, CategoryResolver],
 })
 export class AppModule {}

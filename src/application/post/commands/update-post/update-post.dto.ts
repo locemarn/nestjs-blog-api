@@ -4,7 +4,7 @@ export class UpdatePostInputDto {
   readonly title?: string;
   readonly content?: string;
   readonly publish?: boolean;
-  readonly categoyIds?: number[];
+  readonly categoryIds?: number[];
 }
 
 export type UpdatePostOutputDto = PostOutputDto;
