@@ -7,7 +7,7 @@ export class LoginInput {
   @Field({ description: "User's email address OR username" })
   @IsNotEmpty({ message: 'Email or Username is required' })
   @IsString()
-  emailOrUsername: string;
+  email: string;
 
   @Field({ description: "User's password" })
   @IsNotEmpty({ message: 'Password is required' })

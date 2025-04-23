@@ -177,19 +177,18 @@ export class PrismaPostRepository {
     }
   }
 
-  async findById(id: Identifier): Promise<Post | null> {
-    this.logger.debug(`Finding post by ID: ${id.Value}`);
+  async findById(id: number): Promise<Post | null> {
+    this.logger.debug(`Finding post by ID: ${id}`);
     try {
-      const idForWhere = id.Value as number;
       const prismaPost = await this._prisma.post.findUnique({
-        where: { id: idForWhere },
+        where: { id },
         include: { categories: { select: { id: true } } },
       });
       return this.mapToDomain(prismaPost);
     } catch (error: unknown) {
       const err = error as Error;
       this.logger.error(
-        `Error finding post by ID ${id.Value}: ${err.message}`,
+        `Error finding post by ID ${id}: ${err.message}`,
         err.stack,
       );
       throw error;
@@ -275,14 +274,15 @@ export class PrismaPostRepository {
     return this.find(query);
   }
 
-  async delete(id: Identifier): Promise<boolean> {
-    this.logger.debug(`Attempting to delete post with ID: ${id.Value}`);
+  async delete(id: number): Promise<boolean> {
+    this.logger.debug(`Attempting to delete post with ID: ${id}`);
     try {
-      const idForWhere = id.Value as number;
+      console.log('id --->', id);
+      const idForWhere = id;
       await this._prisma.post.delete({
         where: { id: idForWhere },
       });
-      this.logger.log(`Successfully deleted post with ID: ${id.Value}`);
+      this.logger.log(`Successfully deleted post with ID: ${id}`);
       return true;
     } catch (error) {
       const err = error as Error;
@@ -290,11 +290,11 @@ export class PrismaPostRepository {
         err instanceof Prisma.PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
-        this.logger.warn(`Post with ID ${id.Value} not found for deletion.`);
+        this.logger.warn(`Post with ID ${id} not found for deletion.`);
         return false;
       }
       this.logger.error(
-        `Error deleting post with ID ${id.Value}: ${err.message}`,
+        `Error deleting post with ID ${id}: ${err.message}`,
         err.stack,
       );
       throw err;

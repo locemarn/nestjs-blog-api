@@ -65,7 +65,7 @@ export class Category extends BaseEntity<CategoryProps> {
     if (props.name.Value.length < 3)
       throw new ArgumentNotProvidedException('Category name is required');
 
-    if (props.name.Value.length > 50)
+    if (props.name.Value.length > 20)
       throw new ArgumentNotProvidedException(
         'Category name lenght is too long',
       );

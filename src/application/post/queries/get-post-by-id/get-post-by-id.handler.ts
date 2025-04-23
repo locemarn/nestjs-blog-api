@@ -22,8 +22,11 @@ export class GetPostByIdQueryHandler
   ) {}
 
   async execute(query: GetPostByIdQuery): Promise<PostOutputDto | null> {
+    console.log('query --->', query);
     const postId = Identifier.create(query.postId);
+    console.log('postId --->', postId);
     const post = await this.postRepository.findById(postId.Value as number);
+    console.log('post --->', post);
 
     if (!post) {
       throw new PostNotFoundException(`ID: ${query.postId}`);

@@ -62,8 +62,8 @@ export class UpdatePostCommandHandler
       }
     }
 
-    if (updatedData.categoyIds !== undefined) {
-      const newCategoryIdentifiers = updatedData.categoyIds.map((id) =>
+    if (updatedData.categoryIds !== undefined) {
+      const newCategoryIdentifiers = updatedData.categoryIds.map((id) =>
         Identifier.create(id),
       );
 
@@ -82,8 +82,6 @@ export class UpdatePostCommandHandler
         update = true;
       }
     }
-
-    console.log('updatedData.publish --->', updatedData.publish);
 
     if (updatedData.publish !== undefined) {
       if (updatedData.publish) {

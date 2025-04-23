@@ -1,43 +1,42 @@
-import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { AuthService } from 'src/auth/services/auth.service';
 import { AuthPayloadDto } from './dto/auth-payload.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginInput } from './dto/login.input';
 import { RegisterInputDto } from './dto/register.input';
-import { Role } from 'src/domain/user/entities/user.entity';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetUserByEmailQuery } from 'src/application/user/queries/get-user-by-email/get-user-by-email.query';
+import { UserOutputDto } from 'src/application/user/queries/get-user-by-id/get-user-by-id.dto';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   // Use LocalAuthGuard to trigger LocalStrategy validation
-  @UseGuards(LocalAuthGuard) // Apply the guard
+  // @UseGuards(LocalAuthGuard) // Apply the guard
   @Mutation(() => AuthPayloadDto)
   async login(
     // Args decorator gets input from GraphQL request
     @Args('input') input: LoginInput,
-    @Context()
-    context: {
-      req: Request & {
-        user: Omit<
-          {
-            password: string;
-            email: string;
-            username: string;
-            role: Role;
-            id: number;
-            created_at: Date;
-            updated_at: Date;
-          },
-          'password'
-        >;
-      };
-    },
   ): Promise<AuthPayloadDto> {
-    // LocalAuthGuard runs LocalStrategy.validate. If successful, context.req.user contains the validated user object.
-    // We just need to call the login service to generate the JWT.
-    return this.authService.login(context.req.user);
+    const user = await this.queryBus.execute<
+      GetUserByEmailQuery,
+      UserOutputDto | null
+    >(new GetUserByEmailQuery(input.email));
+    console.log('akiii', user);
+    if (!user || !user.email || !user.username || !user.role || !user.id) {
+      throw new Error('Invalid user data');
+    }
+    return this.authService.login({
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      id: user.id,
+      created_at: user.created_at || new Date(),
+      updated_at: user.updated_at || new Date(),
+    });
   }
 
   @Mutation(() => AuthPayloadDto)

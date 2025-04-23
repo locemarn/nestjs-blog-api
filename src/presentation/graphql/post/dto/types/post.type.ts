@@ -18,7 +18,7 @@ export class PostType {
   authorId: number;
 
   @Field(() => [ID])
-  cateforyIds: number[];
+  categoryIds: number[];
 
   @Field()
   created_at: Date;

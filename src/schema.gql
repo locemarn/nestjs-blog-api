@@ -6,9 +6,26 @@ type AuthPayloadDto {
   accessToken: String!
 }
 
+type Category {
+  """Unique identifier for the category"""
+  id: ID!
+
+  """Unique name of the category"""
+  name: String!
+
+  """Posts associated with this category"""
+  posts: [Post]
+}
+
+"""Data required to create a new category"""
+input CreateCategoryInput {
+  """Name for the new category (must be unique)"""
+  name: String!
+}
+
 input CreatePostInput {
-  """Optional list of category IDs to associate"""
-  categoryIds: [ID!]
+  """Optional list of category IDs (numbers)"""
+  categoryIds: [Int!]
   content: String!
   published: Boolean = false
   title: String!
@@ -26,6 +43,11 @@ input CreateUserInput {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type DeleteCategoryPayload {
+  message: String
+  success: Boolean!
+}
 
 type DeletePostPayload {
   success: Boolean!
@@ -46,17 +68,22 @@ type GetPostsOutputDto {
 """Credentials required for user login"""
 input LoginInput {
   """User's email address OR username"""
-  emailOrUsername: String!
+  email: String!
 
   """User's password"""
   password: String!
 }
 
 type Mutation {
+  """Create a new category."""
+  createCategory(input: CreateCategoryInput!): Category!
   createPost(input: CreatePostInput!): Post!
 
   """Create a new user account."""
   createUser(input: CreateUserInput!): User!
+
+  """Delete a category by ID."""
+  deleteCategory(id: ID!): DeleteCategoryPayload!
 
   """Delete a post by ID."""
   deletePost(id: ID!): DeletePostPayload!
@@ -72,6 +99,9 @@ type Mutation {
   """Unpublish a post, making it a draft."""
   unpublishPost(id: ID!): Post!
 
+  """Update an existing category name."""
+  updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
+
   """Update an existing post."""
   updatePost(id: ID!, input: UpdatePostInput!): Post!
 
@@ -81,7 +111,7 @@ type Mutation {
 
 type Post {
   authorId: ID!
-  cateforyIds: [ID!]!
+  categoryIds: [ID!]!
   content: String!
   created_at: DateTime!
   id: ID!
@@ -91,6 +121,11 @@ type Post {
 }
 
 type Query {
+  """Fetch a list of all categories."""
+  categories: [Category!]!
+
+  """Fetch a single category by its ID."""
+  categoryById(id: ID!): Category
   postById(id: ID!): Post
 
   """Fetch a list of posts with optional filters and pagination."""
@@ -115,9 +150,15 @@ enum Role {
   USER
 }
 
+"""Data for updating an existing category name"""
+input UpdateCategoryInput {
+  """The new unique name for the category"""
+  name: String!
+}
+
 input UpdatePostInput {
   """Replaces all existing categories with this list"""
-  categoryIds: [ID!]
+  categoryIds: [Int!]
   content: String
   published: Boolean
   title: String

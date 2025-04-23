@@ -1,11 +1,11 @@
-import { InputType, Field, ID } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
 import {
   IsOptional,
   IsString,
   MaxLength,
   IsArray,
   IsBoolean,
-  IsNumber,
+  IsInt,
 } from 'class-validator';
 
 @InputType()
@@ -21,14 +21,14 @@ export class UpdatePostInput {
   @IsString()
   content?: string;
 
-  @Field(() => [ID], {
+  @Field(() => [Int], {
     nullable: true,
     description: 'Replaces all existing categories with this list',
   })
   @IsOptional()
   @IsArray()
-  @IsNumber()
-  categoryIds?: (number | string)[];
+  @IsInt({ each: true })
+  categoryIds?: number[];
 
   @Field({ nullable: true })
   @IsOptional()

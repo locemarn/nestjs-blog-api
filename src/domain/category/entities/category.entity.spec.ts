@@ -57,8 +57,8 @@ describe('Category Entity', () => {
   it('should throw when updating name to an invalid value', () => {
     const category = Category.create(validProps, Identifier.create(1));
     expect(() =>
-      category.updateName(CategoryName.create('a'.repeat(60))),
-    ).toThrow('Category name must be between 2 and 50 characters.');
+      category.updateName(CategoryName.create('a'.repeat(30))),
+    ).toThrow('Category name must be between 2 and 20 characters.');
   });
 
   it('should not add update event if name is unchanged', () => {

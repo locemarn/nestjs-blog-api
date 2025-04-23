@@ -74,6 +74,7 @@ export class AuthService {
    * Generates JWT access token upon successful login.
    */
   async login(user: Omit<User, 'password'>): Promise<AuthPayloadDto> {
+    console.log('user --->', user);
     const payload = {
       sub: user.id,
       username: user.username,
