@@ -74,9 +74,9 @@ export class User extends BaseEntity<UserProps> {
     const trimmedUsername = newUsername.trim();
     if (!newUsername || newUsername.trim().length < 3)
       throw new ArgumentNotProvidedException('New username is required');
-    if (newUsername.length > 50)
+    if (newUsername.length > 20)
       throw new ArgumentOutOfRangeException(
-        'Username cannot exceed 50 characters.',
+        'Username cannot exceed 20 characters.',
       );
 
     if (this._props.username !== trimmedUsername) {

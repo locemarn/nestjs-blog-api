@@ -8,6 +8,7 @@ import { POST_REPOSITORY_TOKEN } from 'src/domain/post/repositories/post.reposit
 import { PrismaPostRepository } from './persistence/repositories/prisma-post.repository';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CATEGORY_REPOSITORY_TOKEN } from 'src/domain/category/repositories/category.repository.interface';
+import { PrismaCategoryRepository } from './persistence/repositories/prisma-category.repository';
 
 @Global()
 @Module({
@@ -27,16 +28,7 @@ import { CATEGORY_REPOSITORY_TOKEN } from 'src/domain/category/repositories/cate
     },
     {
       provide: CATEGORY_REPOSITORY_TOKEN,
-      // Use a temporary placeholder mock until PrismaCategoryRepository exists
-      useValue: {
-        save: (cat) => cat as unknown,
-        findById: () => null,
-        findByName: () => null,
-        findManyByIds: () => [],
-        findAll: () => [],
-        delete: () => false,
-      },
-      // useClass: PrismaCategoryRepository, // <-- Use this once implemented
+      useClass: PrismaCategoryRepository,
     },
   ],
   exports: [

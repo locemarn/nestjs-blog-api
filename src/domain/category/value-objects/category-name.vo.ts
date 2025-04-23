@@ -4,7 +4,7 @@ import {
 } from 'src/domain/exceptions/domain.exceptions';
 
 const MIN_LENGTH = 2;
-const MAX_LENGTH = 50;
+const MAX_LENGTH = 20;
 
 export class CategoryName {
   private constructor(private readonly value: string) {
