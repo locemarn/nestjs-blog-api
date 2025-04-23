@@ -10,6 +10,7 @@ import { UnpublishPostCommandHandler } from './commands/unpublish-post/unpublish
 import { GetPostByIdQueryHandler } from './queries/get-post-by-id/get-post-by-id.handler';
 import { InfrastructureModule } from 'src/infrastructure/infrastructure.module';
 import { LogPostCreatedHandler } from './event-handlers/log-post-created.handler';
+import { PostOwnershipGuard } from './guards/post-ownership.guard';
 
 export const PostCommandHandlers: Provider[] = [
   CreatePostCommandHandler,
@@ -34,6 +35,7 @@ export const PostEventHandlers: Provider[] = [LogPostCreatedHandler];
     ...PostCommandHandlers,
     ...PostQueryHandlers,
     ...PostEventHandlers,
+    PostOwnershipGuard,
   ],
   exports: [PostMapper],
 })

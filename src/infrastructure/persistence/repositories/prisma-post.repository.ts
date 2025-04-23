@@ -178,10 +178,11 @@ export class PrismaPostRepository {
   }
 
   async findById(id: number): Promise<Post | null> {
+    const postId = parseInt(String(id), 10);
     this.logger.debug(`Finding post by ID: ${id}`);
     try {
       const prismaPost = await this._prisma.post.findUnique({
-        where: { id },
+        where: { id: postId },
         include: { categories: { select: { id: true } } },
       });
       return this.mapToDomain(prismaPost);

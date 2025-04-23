@@ -31,6 +31,7 @@ import { DeletePostOutputDto } from 'src/application/post/commands/delete-post/d
 import { UpdatePostInput } from './dto/inputs/update-post.input';
 import { Role } from 'src/domain/user/entities/user.entity';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { PostOwnershipGuard } from 'src/application/post/guards/post-ownership.guard';
 
 @Resolver(() => PostType)
 export class PostResolver {
@@ -88,16 +89,16 @@ export class PostResolver {
   }
 
   @Mutation(() => PostType, { description: 'Update an existing post.' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, PostOwnershipGuard)
+  // @Roles(Role.ADMIN)
   async updatePost(
     @Args('id', { type: () => ID }) id: number,
     @Args('input') input: UpdatePostInput,
-    @CurrentUser() user: AuthenticatedUser,
+    // @CurrentUser() user: AuthenticatedUser,
   ): Promise<PostOutputDto> {
     console.log('input --->', input);
     this.logger.log(
-      `GraphQL: Received updatePost mutation for ID: ${id} by User ID: ${user?.userId}`,
+      `GraphQL: Received updatePost mutation for ID: ${id} by User `,
     );
     // Authorization check would go here (e.g., fetch post, check if user.userId === post.authorId)
     // For now, just execute the command
@@ -106,8 +107,8 @@ export class PostResolver {
   }
 
   @Mutation(() => PostType, { description: 'Publish a draft post.' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, PostOwnershipGuard)
+  // @Roles(Role.ADMIN)
   async publishPost(
     @Args() args: PostIdArgs,
     // @CurrentUser() user: AuthenticatedUser,
@@ -124,8 +125,8 @@ export class PostResolver {
   @Mutation(() => PostType, {
     description: 'Unpublish a post, making it a draft.',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, PostOwnershipGuard)
+  // @Roles(Role.ADMIN)
   async unpublishPost(
     @Args() args: PostIdArgs,
     // @CurrentUser() user: AuthenticatedUser,
@@ -140,8 +141,8 @@ export class PostResolver {
   }
 
   @Mutation(() => DeletePostPayload, { description: 'Delete a post by ID.' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, PostOwnershipGuard)
+  // @Roles(Role.ADMIN)
   async deletePost(
     @Args() args: PostIdArgs,
     // @CurrentUser() user: AuthenticatedUser,
