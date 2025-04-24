@@ -1,7 +1,7 @@
 export class Identifier {
-  private constructor(private readonly value: number | string) {}
+  private constructor(private readonly value: number) {}
 
-  get Value(): number | string {
+  get Value(): number {
     return this.value;
   }
 
@@ -10,7 +10,7 @@ export class Identifier {
     return this.value === other.Value;
   }
 
-  static create(value: number | string): Identifier {
+  static create(value: number): Identifier {
     if (value === null || value === undefined)
       throw new Error('Identifier cannot be null or undefined');
     return new Identifier(value);

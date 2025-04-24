@@ -52,7 +52,7 @@ export class UpdateCategoryCommandHandler
       const currentDto = await this.queryBus.execute<
         GetCategoryByIdQuery,
         CategoryOutputDto | null
-      >(new GetCategoryByIdQuery(categoryId.Value as number));
+      >(new GetCategoryByIdQuery(categoryId.Value));
       if (!currentDto)
         throw new Error(
           `Failed to fetch category ID: ${categoryId.Value} even though it exists.`,
@@ -81,7 +81,7 @@ export class UpdateCategoryCommandHandler
     const resultDto = await this.queryBus.execute<
       GetCategoryByIdQuery,
       CategoryOutputDto | null
-    >(new GetCategoryByIdQuery(savedCategory.id.Value as number));
+    >(new GetCategoryByIdQuery(savedCategory.id.Value));
     if (!resultDto) {
       throw new Error(
         `Failed to fetch updated category with ID: ${savedCategory.id.Value}.`,

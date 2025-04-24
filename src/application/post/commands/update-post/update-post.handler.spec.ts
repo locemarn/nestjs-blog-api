@@ -104,7 +104,7 @@ describe('UpdatePostHandler', () => {
       title: 'Updated Title',
       content: 'Updated Content',
       publish: true,
-      categoryIds: [+catId2.Value],
+      categoyIds: [+catId2.Value],
     };
 
     const command = new UpdatePostCommand(+postId.Value, updateInput);

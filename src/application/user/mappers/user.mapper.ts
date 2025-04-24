@@ -18,7 +18,7 @@ export class UserMapper {
     }
     const dto = new UserOutputDto();
     if (entity.id && typeof entity.id === 'object' && 'Value' in entity.id) {
-      Object.assign(dto, { id: (entity.id as { Value: string }).Value }); // Safely assign id using Object.assign
+      Object.assign(dto, { id: (entity.id as { Value: number }).Value }); // Safely assign id using Object.assign
     } else {
       throw new Error('Invalid or missing identifier on User entity');
     }
