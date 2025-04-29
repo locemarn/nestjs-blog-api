@@ -5,7 +5,12 @@ export default defineConfig({
   test: {
     globals: true, // Use global APIs like describe, it, expect
     root: './', // Look for tests in the root directory
-    include: ['**/*.spec.ts', '**/*.test.ts'], // Test file patterns
+    include: [
+      '**/*.spec.ts',
+      '**/*.test.ts',
+      'test/**/*.spec.ts',
+      'test/**/*.test.ts',
+    ], // Test file patterns
     coverage: {
       provider: 'v8', // or 'istanbul'
       reporter: ['text', 'json', 'html'],
@@ -17,21 +22,19 @@ export default defineConfig({
         '**/*.config.ts',
         '**/main.ts',
         '**/prisma/**',
-        '**/*.entity.ts', // Often skip basic entities unless they have logic
-        '**/*.dto.ts', // Usually skip basic DTOs
+        '**/*.entity.ts',
+        '**/*.dto.ts',
         '**/*.input.ts',
         '**/*.args.ts',
-        // Add other patterns as needed
       ],
     },
     alias: {
-      // Optional: Setup path aliases like in tsconfig.json
       '@src': './src',
       '@app': './src/app',
       '@domain': './src/domain',
       '@infra': './src/infra',
       '@config': './src/config',
-      // Add other aliases
+      '@test': './test',
     },
   },
   plugins: [

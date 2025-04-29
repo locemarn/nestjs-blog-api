@@ -9,6 +9,7 @@ import { GetAllCategoriesQueryHandler } from './queries/get-all-categories/get-a
 import { GetCategoryByIdQueryHandler } from './queries/get-category-by-id/get-category-by-id.handler';
 import { UpdateCategoryCommandHandler } from './commands/update-category/update-category.handler';
 import { DeleteCategoryCommandHandler } from './commands/delete-category/delete-category.handler';
+import { InfrastructureModule } from 'src/infrastructure/infrastructure.module';
 
 export const CategoryCommandHandlers: Provider[] = [
   CreateCategoryCommandHandler,
@@ -26,7 +27,7 @@ export const CategoryEventHandlers: Provider[] = [
 ];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [CqrsModule, InfrastructureModule],
   providers: [
     CategoryMapper,
     { provide: CATEGORY_MAPPER_TOKEN, useExisting: CategoryMapper },

@@ -57,15 +57,14 @@ export class PrismaCategoryRepository implements ICategoryRepository {
 
   async save(category: Category): Promise<Category> {
     const persistenceData = this.mapToPersistence(category);
-    let savedOrUpdatedPrismaCategory: PrismaCategory;
-
     const categoryIdValue = category.id?.Value;
     const isUpdate = categoryIdValue !== undefined && categoryIdValue !== 0;
 
     try {
+      let savedOrUpdatedPrismaCategory: PrismaCategory;
       if (isUpdate) {
         // --- UPDATE ---
-        const idForWhere = categoryIdValue as number;
+        const idForWhere = categoryIdValue;
         this.logger.debug(
           `Updating category ID: ${idForWhere} with data: ${JSON.stringify(persistenceData)}`,
         );
@@ -122,10 +121,13 @@ export class PrismaCategoryRepository implements ICategoryRepository {
       throw error;
     }
   }
+
   async findById(id: Identifier): Promise<Category | null> {
     this.logger.debug(`Finding category by ID: ${id.Value}`);
     try {
-      const idForWhere = id.Value as number;
+      const idForWhere = parseInt(String(id.Value), 10);
+      if (isNaN(idForWhere)) return null;
+
       const prismaCategory = await this._prisma.category.findUnique({
         where: { id: idForWhere },
       });
@@ -161,7 +163,11 @@ export class PrismaCategoryRepository implements ICategoryRepository {
 
   async findManyByIds(ids: Identifier[]): Promise<Category[]> {
     if (ids.length === 0) return [];
-    const primitiveIds = ids.map((id) => id.Value as number); // Assuming number IDs
+    const primitiveIds = ids
+      .map((id) => parseInt(String(id.Value), 10))
+      .filter((id) => !isNaN(id));
+    if (primitiveIds.length === 0) return [];
+
     this.logger.debug(`Finding categories by IDs: ${primitiveIds.join(', ')}`);
     try {
       const prismaCategories = await this._prisma.category.findMany({
@@ -212,7 +218,13 @@ export class PrismaCategoryRepository implements ICategoryRepository {
   }
 
   async delete(id: Identifier): Promise<boolean> {
-    const idForWhere = id.Value as number;
+    const idForWhere = parseInt(String(id.Value), 10);
+    if (isNaN(idForWhere)) {
+      this.logger.error(
+        `Invalid non-numeric ID passed to category delete: ${id.Value}`,
+      );
+      return false;
+    }
     this.logger.debug(`Attempting to delete category with ID: ${idForWhere}`);
     try {
       await this._prisma.category.delete({

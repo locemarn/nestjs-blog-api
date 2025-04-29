@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import { IEvent } from '@nestjs/cqrs';
+import { Identifier } from './identifier';
 
 export interface IDomainEvent extends IEvent {
-  readonly aggregateId: string | number; // ID of the entity the event relates to
+  readonly aggregateId: Identifier | number | string | any;
   readonly occurredOn: Date;
 }

@@ -52,8 +52,6 @@ export class CreateUserCommandHandler
       const passwordHash = await this.passwordHasher.hash(password);
 
       // 3. Create domain entity (encapsulates validation and business rules)
-      // Wrap domain entity creation in try-catch if its exceptions shouldn't bubble directly
-      // or if you want to map them to ApplicationExceptions. For now, let them bubble.
       const user = User.create({
         email: emailLower,
         username: usernameLower,

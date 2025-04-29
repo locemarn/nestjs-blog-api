@@ -111,7 +111,7 @@ describe('CreateCategoryCommandHandler', () => {
       eventBus,
     );
     expect(queryBus.execute).toHaveBeenCalledWith(
-      new GetCategoryByIdQuery(savedCategoryId.Value as number),
+      new GetCategoryByIdQuery(savedCategoryId.Value),
     );
     expect(result).toEqual(expectedOutputDto);
   });

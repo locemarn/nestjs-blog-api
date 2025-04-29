@@ -35,8 +35,8 @@ const mockQueryBus = { execute: vi.fn() };
 
 describe('CreateUserCommandHandler', () => {
   let handler: CreateUserCommandHandler;
-  let eventBus: EventBus;
-  let queryBus: QueryBus;
+  // let eventBus: EventBus;
+  // let queryBus: QueryBus;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -52,8 +52,8 @@ describe('CreateUserCommandHandler', () => {
     }).compile();
 
     handler = moduleRef.get(CreateUserCommandHandler);
-    eventBus = moduleRef.get(EventBus);
-    queryBus = moduleRef.get(QueryBus);
+    // eventBus = moduleRef.get(EventBus);
+    // queryBus = moduleRef.get(QueryBus);
 
     // Mock implementation for successfuly case by default
     (mockPasswordHasher.hash as Mock).mockResolvedValue('hashed_password');

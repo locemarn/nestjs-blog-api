@@ -67,13 +67,13 @@ export class PostOwnershipGuard implements CanActivate {
         'Cannot determine resource identifier for authorization.',
       );
     }
-    const postId = Identifier.create(postIdPrimitive);
+    const postId = Identifier.create(+postIdPrimitive);
 
     // --- 4. Fetch the Resource ---
     this.logger.debug(
       `Checking ownership for User ID: ${currentUserId.Value} on Post ID: ${postId.Value}`,
     );
-    const post = await this.postRepository.findById(postId.Value as number);
+    const post = await this.postRepository.findById(postId.Value);
     if (!post) {
       // If the post doesn't exist, throw NotFound rather than Forbidden
       // This prevents leaking information about post existence.
