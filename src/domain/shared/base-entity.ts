@@ -1,6 +1,7 @@
 import { IEventPublisher } from '@nestjs/cqrs';
 import { IDomainEvent } from './domain-event.interface';
 import { Identifier } from './identifier';
+import { DomainEvent } from './domain-event.base';
 
 export abstract class BaseEntity<TProps> {
   protected readonly _id: Identifier;
@@ -16,8 +17,8 @@ export abstract class BaseEntity<TProps> {
     return this._id;
   }
 
-  get domainEvents(): IDomainEvent[] {
-    return this._domainEvents;
+  get domainEvents(): ReadonlyArray<DomainEvent> {
+    return Object.freeze([...this._domainEvents]);
   }
 
   protected addDomainEvent(domainEvent: IDomainEvent): void {

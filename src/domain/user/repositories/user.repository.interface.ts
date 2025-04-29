@@ -8,5 +8,4 @@ export interface IUserRepository {
   delete(id: Identifier): Promise<boolean>;
 }
 
-// Define an injection token for NestJS DI
 export const USER_REPOSITORY_TOKEN = Symbol('IUserRepository');

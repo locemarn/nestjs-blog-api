@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CategoryAppModule } from './application/category/category.module';
 import { CategoryResolver } from './presentation/graphql/category/category.resolver';
+import { CommentAppModule } from './application/comment/comment.module';
 
 @Module({
   imports: [
@@ -22,8 +23,9 @@ import { CategoryResolver } from './presentation/graphql/category/category.resol
     InfrastructureModule,
     UserAppModule,
     PostAppModule,
-    AuthModule,
     CategoryAppModule,
+    CommentAppModule,
+    AuthModule,
     AppGraphQLModule,
   ],
   controllers: [],
