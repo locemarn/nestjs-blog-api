@@ -1,8 +1,8 @@
 import { Identifier } from 'src/domain/shared/identifier';
 import { CommentContent } from '../value-objects/comment-content.vo';
 import { BaseEntity } from 'src/domain/shared/base-entity';
-import { CommentResponseCreatedEvent } from '../events/comment-response-created.event';
 import { ArgumentNotProvidedException } from '../exceptions/comment.exceptions';
+import { CommentResponseCreatedEvent } from '../events/comment-response-created.event';
 import { CommentUpdatedEvent } from '../events/comment-updated.event';
 
 export interface CommentResponseProps {

@@ -14,6 +14,7 @@ export interface CommentProps {
   responses?: CommentResponse[];
   created_at?: Date;
   updated_at?: Date;
+  replies?: [];
 }
 
 export class Comment extends BaseEntity<CommentProps> {
