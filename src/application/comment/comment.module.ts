@@ -6,11 +6,12 @@ import { CreateCommentCommandHandler } from './commands/create-comment/create-co
 import { CommentMapper, COMMENT_MAPPER_TOKEN } from './mappers/comment.mapper';
 import { InfrastructureModule } from 'src/infrastructure/infrastructure.module';
 import { USER_REPOSITORY_TOKEN } from 'src/domain/user/repositories/user.repository.interface';
+import { UpdateCommentCommandHandler } from './commands/update-comment/update-comment.handler';
 
 export const CommentCommandHandlers: Provider[] = [
   CreateCommentCommandHandler,
+  UpdateCommentCommandHandler,
   // AddReplyCommandHandler,
-  // UpdateCommentCommandHandler,
   // DeleteCommentCommandHandler,
   // UpdateReplyCommandHandler, // Add when implemented
   // DeleteReplyCommandHandler, // Add when implemented

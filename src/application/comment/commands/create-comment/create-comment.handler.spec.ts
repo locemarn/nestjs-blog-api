@@ -128,34 +128,6 @@ describe('CreateCommentCommandHandler', () => {
   };
   // --- End Test Data Setup ---
 
-  // beforeEach(async () => {
-  //   vi.resetAllMocks(); // Reset mocks before each test
-
-  //   const moduleRef: TestingModule = await Test.createTestingModule({
-  //     providers: [
-  //       CreateCommentCommandHandler,
-  //       {
-  //         provide: COMMENT_REPOSITORY_TOKEN,
-  //         useFactory: () => mockCommentRepository,
-  //       },
-  //       { provide: 'IUserRepository', useFactory: () => mockUserRepository },
-  //       { provide: 'IPostRepository', useFactory: () => mockPostRepository }, // Use string/Symbol as needed
-  //       { provide: EventBus, useFactory: () => mockEventBus },
-  //       { provide: QueryBus, useFactory: () => mockQueryBus },
-  //     ],
-  //   }).compile();
-
-  //   // Get instances
-  //   handler = moduleRef.get<CreateCommentCommandHandler>(
-  //     CreateCommentCommandHandler,
-  //   );
-  //   commentRepositoryMock = moduleRef.get('ICommentRepository'); // Use string/Symbol as needed
-  //   userRepositoryMock = moduleRef.get('IUserRepository');
-  //   postRepositoryMock = moduleRef.get('IPostRepository'); // Use string/Symbol as needed
-  //   eventBusMock = moduleRef.get(EventBus);
-  //   queryBusMock = moduleRef.get(QueryBus);
-  // });
-
   beforeEach(async () => {
     vi.resetAllMocks();
 

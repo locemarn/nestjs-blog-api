@@ -17,11 +17,12 @@ export class CommentMapper {
     return {
       id: entity.id.Value,
       content: entity.content.Value,
+      postId: entity.postId.Value,
       authorId: entity.userId.Value,
       commentId: entity.commentId.Value,
-      postId: entity.postId.Value,
       created_at: entity._props.created_at as Date,
       updated_at: entity._props.updated_at as Date,
+      // replies: entity._props.replies?.map((reply) => this.toDto(reply)) ?? [],
     };
   }
 
