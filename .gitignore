@@ -64,3 +64,8 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 generated
+
+.idea
+.vscode
+
+/test/di-test.spec.ts

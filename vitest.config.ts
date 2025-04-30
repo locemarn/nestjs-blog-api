@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-// import swc from 'unplugin-swc'; // For faster compilation if needed
+import swc from 'unplugin-swc'; // For faster compilation if needed
 
 export default defineConfig({
   test: {
@@ -40,6 +40,6 @@ export default defineConfig({
   plugins: [
     // Optional: Use SWC for faster test execution
     // Make sure to install unplugin-swc and @swc/core
-    // swc.vite(),
+    swc.vite(),
   ],
 });
