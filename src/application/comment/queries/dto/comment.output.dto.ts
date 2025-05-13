@@ -7,6 +7,5 @@ export class CommentOutputDto {
   postId: number;
   created_at: Date;
   updated_at: Date;
-  replies: CommentResponseOutputDto[]; // Array of reply DTOs
-  // Optional: Add author username/details later
+  replies: CommentResponseOutputDto[];
 }

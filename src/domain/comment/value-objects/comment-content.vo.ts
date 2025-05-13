@@ -7,37 +7,40 @@ const MIN_LENGTH = 1;
 const MAX_LENGTH = 1000;
 
 export class CommentContent {
-  private constructor(private readonly value: string) {
+  private readonly _value: string;
+
+  private constructor(value: string) {
+    this._value = value;
     this.validate();
   }
 
   get Value(): string {
-    return this.value;
+    return this._value;
   }
 
-  static create(content: string): CommentContent {
-    const trimmedContent = content ? content.trim() : '';
+  public static create(content: string): CommentContent {
+    // Ensure content is a string and trim it; handle null/undefined gracefully before constructing.
+    const trimmedContent = typeof content === 'string' ? content.trim() : '';
     return new CommentContent(trimmedContent);
   }
 
   private validate(): void {
-    if (
-      this.value === null ||
-      this.value === undefined ||
-      this.value.length < MIN_LENGTH
-    ) {
+    if (this._value.length < MIN_LENGTH) {
       throw new ArgumentNotProvidedException(
-        'Comment content cannot be empty.',
+        `Comment content cannot be empty or less than ${MIN_LENGTH} character(s) after trimming.`,
       );
     }
-    if (this.value.length > MAX_LENGTH) {
+    if (this._value.length > MAX_LENGTH) {
       throw new ArgumentOutOfRangeException(
         `Comment content cannot exceed ${MAX_LENGTH} characters.`,
       );
     }
   }
 
-  equals(other?: CommentContent): boolean {
-    return other instanceof CommentContent && this.value === other.Value;
+  public equals(other?: CommentContent): boolean {
+    if (other === null || other === undefined) {
+      return false;
+    }
+    return this._value === other.Value;
   }
 }

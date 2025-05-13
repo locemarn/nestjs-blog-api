@@ -7,12 +7,13 @@ import { CommentMapper, COMMENT_MAPPER_TOKEN } from './mappers/comment.mapper';
 import { InfrastructureModule } from 'src/infrastructure/infrastructure.module';
 import { USER_REPOSITORY_TOKEN } from 'src/domain/user/repositories/user.repository.interface';
 import { UpdateCommentCommandHandler } from './commands/update-comment/update-comment.handler';
+import { DeleteCommentCommandHandler } from './commands/delete-comment/delete-comment.handler';
 
 export const CommentCommandHandlers: Provider[] = [
   CreateCommentCommandHandler,
   UpdateCommentCommandHandler,
+  DeleteCommentCommandHandler,
   // AddReplyCommandHandler,
-  // DeleteCommentCommandHandler,
   // UpdateReplyCommandHandler, // Add when implemented
   // DeleteReplyCommandHandler, // Add when implemented
 ];

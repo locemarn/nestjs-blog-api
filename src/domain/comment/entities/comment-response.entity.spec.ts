@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CommentResponse,
   CommentResponseProps,
@@ -7,71 +8,188 @@ import { CommentContent } from '../value-objects/comment-content.vo';
 import { Identifier } from 'src/domain/shared/identifier';
 
 describe('CommentResponse Entity', () => {
-  let mininalValueProps: CommentResponseProps;
+  type CommentResponseCreationArgs = Omit<
+    CommentResponseProps,
+    'created_at' | 'updated_at'
+  > & {
+    created_at?: Date;
+    updated_at?: Date;
+  };
+
+  let validCreationArgs: CommentResponseCreationArgs;
+  let userId: Identifier;
+  let parentCommentId: Identifier; // ID of the Comment it's replying to
+  let content: CommentContent;
+  let fixedTime: Date;
 
   beforeEach(() => {
-    mininalValueProps = {
-      content: CommentContent.create('This is a valid response comment.'),
-      userId: Identifier.create(123),
-      commentId: Identifier.create(456),
-      postId: Identifier.create(789),
+    fixedTime = new Date('2024-03-19T10:00:00.000Z');
+    vi.useFakeTimers();
+    vi.setSystemTime(fixedTime);
+
+    userId = Identifier.create(1);
+    parentCommentId = Identifier.create(10);
+    content = CommentContent.create('This is a valid response content.'); // Min 1 char by VO
+
+    validCreationArgs = {
+      content,
+      userId,
+      commentId: parentCommentId,
     };
   });
 
-  it('should create a response comment', () => {
-    const responseComment = CommentResponse.create(mininalValueProps);
-
-    expect(responseComment).toBeInstanceOf(CommentResponse);
-    expect(responseComment.id.Value).toBe(0);
-    expect(responseComment.content).toBe(mininalValueProps.content);
-    expect(responseComment.userId).toBe(mininalValueProps.userId);
-    expect(responseComment.postId).toBe(mininalValueProps.postId);
-    expect(responseComment._props.created_at).toBeInstanceOf(Date);
-    expect(responseComment._props.updated_at).toBeInstanceOf(Date);
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
-  it('should throw an error when creating with invalid userId value (e.g., empty)', () => {
-    const invalidProps = {
-      ...mininalValueProps,
-      userId: null as unknown as Identifier,
-    };
-    expect(() => CommentResponse.create(invalidProps)).toThrow(
-      'Response author (userId) is required.',
-    );
+  describe('Static create() method', () => {
+    it('should create a new CommentResponse instance with default timestamps', () => {
+      const response = CommentResponse.create(validCreationArgs);
+
+      expect(response).toBeInstanceOf(CommentResponse);
+      expect(response.id.Value).toBe(0); // Default from BaseEntity
+      expect(response.content.equals(content)).toBe(true);
+      expect(response.userId.equals(userId)).toBe(true);
+      expect(response.commentId.equals(parentCommentId)).toBe(true);
+      expect(response.created_at).toEqual(fixedTime);
+      expect(response.updated_at).toEqual(fixedTime);
+      // Assuming CommentResponse does not add domain events on creation by default
+      expect(response.domainEvents).toHaveLength(0);
+    });
+
+    it('should create a CommentResponse with a specific ID and provided timestamps (reconstitution)', () => {
+      const entityId = Identifier.create(55);
+      const specificCreateTime = new Date('2024-01-01T00:00:00.000Z');
+      const specificUpdateTime = new Date('2024-01-01T01:00:00.000Z');
+
+      const reconstitutionArgs: CommentResponseCreationArgs = {
+        ...validCreationArgs,
+        created_at: specificCreateTime,
+        updated_at: specificUpdateTime,
+      };
+      const response = CommentResponse.create(reconstitutionArgs, entityId);
+
+      expect(response.id.equals(entityId)).toBe(true);
+      expect(response.created_at).toEqual(specificCreateTime);
+      expect(response.updated_at).toEqual(specificUpdateTime);
+    });
+
+    // Validation tests for create() arguments (as per your entity's create method)
+    it('should throw ArgumentNotProvidedException if content object is not provided', () => {
+      const args = { ...validCreationArgs, content: undefined as any };
+      expect(() => CommentResponse.create(args)).toThrowError(
+        'Response content is required.',
+      );
+    });
+
+    it('should throw ArgumentNotProvidedException if userId is not provided', () => {
+      const args = { ...validCreationArgs, userId: undefined as any };
+      expect(() => CommentResponse.create(args)).toThrowError(
+        'Response userId is required.',
+      );
+    });
+
+    it('should throw ArgumentNotProvidedException if commentId (parentCommentId) is not provided', () => {
+      const args = { ...validCreationArgs, commentId: undefined as any };
+      expect(() => CommentResponse.create(args)).toThrowError(
+        'Response parent commentId is required.',
+      );
+    });
   });
 
-  it('should throw an error when creating with invalid commentId value (e.g., empty)', () => {
-    const invalidProps = {
-      ...mininalValueProps,
-      commentId: null as unknown as Identifier,
-    };
-    expect(() => CommentResponse.create(invalidProps)).toThrow(
-      'Response parent comment ID (commentId) is required.',
-    );
+  describe('updateContent() method', () => {
+    let response: CommentResponse;
+    const initialCreateTime = new Date('2024-03-19T08:00:00.000Z');
+
+    beforeEach(() => {
+      // Create with specific old timestamps
+      const creationArgsWithOldTime: CommentResponseCreationArgs = {
+        ...validCreationArgs,
+        created_at: initialCreateTime,
+        updated_at: initialCreateTime,
+      };
+      response = CommentResponse.create(
+        creationArgsWithOldTime,
+        Identifier.create(1),
+      );
+    });
+
+    it('should update content and updated_at timestamp', () => {
+      // Ensure new content meets the >= 3 char rule of updateContent
+      const newContent = CommentContent.create(
+        'Updated response text that is long enough.',
+      );
+      const updateTime = new Date('2024-03-19T11:00:00.000Z');
+      vi.setSystemTime(updateTime); // Simulate time of update
+
+      response.updateContent(newContent);
+
+      expect(response.content.equals(newContent)).toBe(true);
+      expect(response.updated_at).toEqual(updateTime);
+      expect(response.created_at).toEqual(initialCreateTime); // Should not change
+    });
+
+    it('should not update or change updated_at if new content is the same', () => {
+      // Ensure original content also meets the >= 3 char rule for this test to be meaningful
+      const originalLongEnoughContent = CommentContent.create(
+        'Original long enough content.',
+      );
+      const args = {
+        ...validCreationArgs,
+        content: originalLongEnoughContent,
+        updated_at: initialCreateTime,
+      };
+      response = CommentResponse.create(args, Identifier.create(1));
+
+      const originalUpdatedAt = response.updated_at;
+      response.updateContent(originalLongEnoughContent); // Same content
+
+      expect(response.updated_at).toEqual(originalUpdatedAt);
+    });
+
+    it('should throw ArgumentNotProvidedException if newContent object is null', () => {
+      expect(() => response.updateContent(null as any)).toThrowError(
+        'Response Comment content is required', // Message from updateContent
+      );
+    });
+
+    it('should throw ArgumentNotProvidedException if newContent.Value has length < 3', () => {
+      const shortContent = CommentContent.create('Hi'); // VO allows this (len 2 >= MIN_LENGTH 1)
+      expect(() => response.updateContent(shortContent)).toThrowError(
+        'Response Comment content is required', // This message is a bit generic.
+        // Consider: 'Response content must be at least 3 characters long.'
+      );
+    });
+
+    it('should throw (from VO) if newContent is created with an empty string', () => {
+      // This tests that CommentContent.create itself prevents totally empty content
+      const MIN_LENGTH_FROM_VO = 1; // From CommentContent.vo.ts
+      expect(() => CommentContent.create('')).toThrowError(
+        `Comment content cannot be empty or less than ${MIN_LENGTH_FROM_VO} character(s) after trimming.`,
+      );
+    });
   });
 
-  it('should throw an error when creating with invalid postId value (e.g., empty)', () => {
-    const invalidProps = {
-      ...mininalValueProps,
-      postId: null as unknown as Identifier,
-    };
-    expect(() => CommentResponse.create(invalidProps)).toThrow(
-      'Response post ID (postId) is required.',
-    );
-  });
+  describe('Getters', () => {
+    it('should return correct values through getters', () => {
+      const id = Identifier.create(123);
+      const createTime = new Date('2023-01-01T00:00:00.000Z');
+      const updateTime = new Date('2023-01-01T01:00:00.000Z');
+      const args: CommentResponseCreationArgs = {
+        content: CommentContent.create('Getter test content...'),
+        userId: Identifier.create(7),
+        commentId: Identifier.create(77),
+        created_at: createTime,
+        updated_at: updateTime,
+      };
+      const response = CommentResponse.create(args, id);
 
-  it('should update a response comment', () => {
-    const responseComment = CommentResponse.create(mininalValueProps);
-    const newContent = 'Updated response content.';
-    responseComment.updateContent(newContent as unknown as CommentContent);
-
-    expect(responseComment.content).toBe(newContent);
-  });
-
-  it('should throw an error when updating content to an invalid value (e.g., empty)', () => {
-    const responseComment = CommentResponse.create(mininalValueProps);
-    expect(() =>
-      responseComment.updateContent('' as unknown as CommentContent),
-    ).toThrow('Response content is required.');
+      expect(response.id.equals(id)).toBe(true);
+      expect(response.content.Value).toBe('Getter test content...');
+      expect(response.userId.equals(args.userId)).toBe(true);
+      expect(response.commentId.equals(args.commentId)).toBe(true);
+      expect(response.created_at).toEqual(createTime);
+      expect(response.updated_at).toEqual(updateTime);
+    });
   });
 });

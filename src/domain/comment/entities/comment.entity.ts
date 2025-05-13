@@ -3,33 +3,57 @@ import { BaseEntity } from 'src/domain/shared/base-entity';
 import { Identifier } from 'src/domain/shared/identifier';
 import { CommentContent } from '../value-objects/comment-content.vo';
 import { CommentUpdatedEvent } from '../events/comment-updated.event';
-import { InvalidCommentOperationException } from '../exceptions/comment.exceptions';
+import {
+  ArgumentInvalidException,
+  InvalidCommentOperationException,
+} from '../exceptions/comment.exceptions';
 import { CommentCreatedEvent } from '../events/comment-created.event';
 import { CommentResponse } from './comment-response.entity';
+import { CommentDeletedEvent } from '../events/comment-deleted.event';
 
+/**
+ * Defines the internal properties structure of a Comment entity.
+ * After creation via `Comment.create()`, all these properties are guaranteed to be set.
+ */
 export interface CommentProps {
   content: CommentContent;
   postId: Identifier;
   userId: Identifier;
-  responses?: CommentResponse[];
-  created_at?: Date;
-  updated_at?: Date;
-  replies?: [];
+  responses: CommentResponse[];
+  created_at: Date;
+  updated_at: Date;
 }
 
 export class Comment extends BaseEntity<CommentProps> {
   private constructor(props: CommentProps, id?: Identifier) {
-    // Initialize responses array if not provided
-    super({ ...props, responses: props.responses ?? [] }, id);
+    super(props, id);
   }
 
-  public static create(props: CommentProps, id?: Identifier): Comment {
-    this.validateProps(props);
-    const commentProps = {
-      ...props,
-      responses: props.responses ?? [],
+  public static create(
+    creationArgs: Omit<
+      CommentProps,
+      'responses' | 'created_at' | 'updated_at'
+    > & {
+      responses?: CommentResponse[];
+      created_at?: Date;
+      updated_at?: Date;
+    },
+    id?: Identifier,
+  ): Comment {
+    this.validateCreationArgs(creationArgs);
+
+    const now = new Date();
+
+    const fullProps: CommentProps = {
+      content: creationArgs.content,
+      postId: creationArgs.postId,
+      userId: creationArgs.userId,
+      responses: creationArgs.responses ?? [],
+      created_at: creationArgs.created_at ?? now,
+      updated_at: creationArgs.updated_at ?? now,
     };
-    const comment = new Comment(commentProps, id);
+
+    const comment = new Comment(fullProps, id);
 
     if (!id || id.Value === 0) {
       comment.addDomainEvent(
@@ -39,7 +63,6 @@ export class Comment extends BaseEntity<CommentProps> {
     return comment;
   }
 
-  // --- Getters ---
   get content(): CommentContent {
     return this._props.content;
   }
@@ -50,67 +73,111 @@ export class Comment extends BaseEntity<CommentProps> {
     return this._props.postId;
   }
   get responses(): ReadonlyArray<CommentResponse> {
-    return this._props.responses
-      ? Object.freeze([...this._props.responses])
-      : [];
+    return Object.freeze([...this._props.responses]);
+  }
+  get created_at(): Date {
+    return this._props.created_at;
+  }
+  get updated_at(): Date {
+    return this._props.updated_at;
   }
 
-  // --- Business Methods ---
   public updateContent(newContent: CommentContent): void {
-    if (!newContent || newContent.Value.length === 0)
-      throw new ArgumentNotProvidedException('Response cannot be null.');
+    if (!newContent) {
+      throw new ArgumentNotProvidedException(
+        'New content (CommentContent object) cannot be null.',
+      );
+    }
+    if (newContent.Value.trim().length === 0) {
+      throw new ArgumentInvalidException(
+        'Comment content value cannot be empty or consist only of whitespace.',
+      );
+    }
     if (!this.content.equals(newContent)) {
       this._props.content = newContent;
+      this._props.updated_at = new Date();
       this.addDomainEvent(new CommentUpdatedEvent(this.id));
     }
   }
 
-  // Method to add a response - This manages the relationship
-  // Note: Actual creation/persistence of response happens via App layer + Repo usually
-  // This domain method might just validate the addition or add an event
-  public addResponse(response: CommentResponse): void {
-    if (!response) {
+  public addResponse(responseToAdd: CommentResponse): void {
+    if (!responseToAdd) {
       throw new ArgumentNotProvidedException('Response cannot be null.');
     }
-    // Ensure response belongs to this comment
-    if (!response.commentId.equals(this.id)) {
+    if (!responseToAdd.commentId.equals(this.id)) {
       throw new InvalidCommentOperationException(
-        'Cannot add response to the wrong parent comment.',
+        'Cannot add response: it belongs to a different parent comment.',
       );
     }
-    if (!this._props.responses) {
-      this._props.responses = [];
-    }
-
-    // Check if response already exists (by ID) - prevents duplicates if list is managed here
-    const exists = this._props.responses?.some((r) => r.id.equals(response.id));
-
+    // No need for: this._props.responses = this._props.responses || [];
+    const exists = this._props.responses.some((r) =>
+      r.id.equals(responseToAdd.id),
+    );
     if (!exists) {
-      this._props.responses?.push(response);
+      this._props.responses.push(responseToAdd);
+      this._props.updated_at = new Date(); // Update timestamp
     }
   }
 
-  // Method to remove a response (if needed)
-  public removeResponse(responseId: Identifier): void {
-    // const initialLength = this._props.responses?.length ?? 0;
-    if (this._props.responses) {
-      this._props.responses = this._props.responses.filter(
-        (r) => !r.id.equals(responseId),
+  public removeResponse(responseIdToRemove: Identifier): void {
+    if (!responseIdToRemove) {
+      throw new ArgumentNotProvidedException(
+        'Response ID to remove cannot be null.',
       );
+    }
+
+    const initialLength = this._props.responses.length;
+    this._props.responses = this._props.responses.filter(
+      (response) => !response.id.equals(responseIdToRemove),
+    );
+
+    if (this._props.responses.length < initialLength) {
+      this._props.updated_at = new Date();
     }
   }
 
-  // --- Validation ---
-  private static validateProps(props: CommentProps): void {
-    if (!props.content)
-      throw new ArgumentNotProvidedException('Comment content is required.');
-    if (!props.userId)
+  public isAuthoredBy(userId: Identifier): boolean {
+    if (!userId) return false;
+    return this.authorId.equals(userId);
+  }
+
+  public delete(): void {
+    this.addDomainEvent(
+      new CommentDeletedEvent(this.id, this.postId, this.authorId),
+    );
+  }
+
+  private static validateCreationArgs(
+    // Using Parameters utility type to get the exact type of creationArgs from Comment.create
+    args: Parameters<typeof Comment.create>[0],
+  ): void {
+    if (!args.content) {
       throw new ArgumentNotProvidedException(
-        'Comment author (userId) is required.',
+        'Comment content (CommentContent object) is required for creation.',
       );
-    if (!props.postId)
+    }
+    // Assuming CommentContent.create already validated the string content itself.
+
+    if (!args.userId) {
       throw new ArgumentNotProvidedException(
-        'Comment post ID (postId) is required.',
+        'Comment author (userId) is required for creation.',
       );
+    }
+    if (!(args.userId instanceof Identifier)) {
+      throw new ArgumentInvalidException(
+        'Comment author (userId) must be an instance of Identifier.',
+      );
+    }
+
+    if (!args.postId) {
+      throw new ArgumentNotProvidedException(
+        'Comment post ID (postId) is required for creation.',
+      );
+    }
+    if (!(args.postId instanceof Identifier)) {
+      throw new ArgumentInvalidException(
+        'Comment post ID (postId) must be an instance of Identifier.',
+      );
+    }
   }
 }

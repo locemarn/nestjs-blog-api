@@ -11,23 +11,47 @@ export class CommentMapper {
   toResponseDto(
     entity: CommentResponse | null,
   ): CommentResponseOutputDto | null {
-    if (!entity) {
+    if (!entity) return null;
+
+    if (
+      !entity.id ||
+      !entity.content ||
+      !entity.userId ||
+      !entity.commentId ||
+      !entity.created_at ||
+      !entity.updated_at
+    ) {
+      console.error(
+        'CommentMapper.toResponseDto: Incomplete CommentResponse entity provided.',
+      );
       return null;
     }
+
     return {
       id: entity.id.Value,
       content: entity.content.Value,
-      postId: entity.postId.Value,
       authorId: entity.userId.Value,
       commentId: entity.commentId.Value,
-      created_at: entity._props.created_at as Date,
-      updated_at: entity._props.updated_at as Date,
-      // replies: entity._props.replies?.map((reply) => this.toDto(reply)) ?? [],
+      created_at: entity.created_at,
+      updated_at: entity.updated_at,
     };
   }
 
   toDto(entity: Comment | null): CommentOutputDto | null {
-    if (!entity) {
+    if (!entity) return null;
+    if (
+      !entity.id ||
+      !entity.content ||
+      !entity.authorId ||
+      !entity.postId ||
+      !entity.created_at ||
+      !entity.updated_at
+    ) {
+      // MAKE SURE THIS LOG IS ACTIVE AND STRINGIFIES THE ENTITY
+      console.error(
+        'CommentMapper.toDto: Incomplete Comment entity provided. Entity details:',
+        JSON.stringify(entity, null, 2),
+      );
       return null;
     }
 
@@ -45,8 +69,8 @@ export class CommentMapper {
       authorId: entity.authorId.Value,
       postId: entity.postId.Value,
       replies: replyDtos,
-      created_at: entity._props.created_at as Date,
-      updated_at: entity._props.updated_at as Date,
+      created_at: entity.created_at,
+      updated_at: entity.updated_at,
     };
   }
 
