@@ -140,15 +140,9 @@ describe('UpdateCommentCommandHandler (using Test.createTestingModule)', () => {
     handler = moduleRef.get<UpdateCommentCommandHandler>(
       UpdateCommentCommandHandler,
     );
-    mockCommentRepository = moduleRef.get(COMMENT_REPOSITORY_TOKEN); // Get repo by token
-    mockCommentMapper = moduleRef.get(CommentMapper); // Get mapper by class
-    mockEventBus = moduleRef.get(EventBus); // Get event bus by class
-
-    // Optional: Verify instances were retrieved (can be removed once stable)
-    // console.log(`[Test Setup] Handler retrieved: ${!!handler}`);
-    // console.log(`[Test Setup] Repository mock retrieved: ${!!mockCommentRepository}`);
-    // console.log(`[Test Setup] Mapper mock retrieved: ${!!mockCommentMapper}`);
-    // console.log(`[Test Setup] EventBus mock retrieved: ${!!mockEventBus}`);
+    mockCommentRepository = moduleRef.get(COMMENT_REPOSITORY_TOKEN);
+    mockCommentMapper = moduleRef.get(CommentMapper);
+    mockEventBus = moduleRef.get(EventBus);
   });
 
   // --- Test Cases ---

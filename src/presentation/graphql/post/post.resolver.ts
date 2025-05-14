@@ -96,7 +96,6 @@ export class PostResolver {
     @Args('input') input: UpdatePostInput,
     // @CurrentUser() user: AuthenticatedUser,
   ): Promise<PostOutputDto> {
-    console.log('input --->', input);
     this.logger.log(
       `GraphQL: Received updatePost mutation for ID: ${id} by User `,
     );

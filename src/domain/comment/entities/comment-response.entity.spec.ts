@@ -78,7 +78,7 @@ describe('CommentResponse Entity', () => {
     it('should throw ArgumentNotProvidedException if content object is not provided', () => {
       const args = { ...validCreationArgs, content: undefined as any };
       expect(() => CommentResponse.create(args)).toThrowError(
-        'Response content is required.',
+        'Response content (CommentContent object) is required.',
       );
     });
 
@@ -149,15 +149,14 @@ describe('CommentResponse Entity', () => {
 
     it('should throw ArgumentNotProvidedException if newContent object is null', () => {
       expect(() => response.updateContent(null as any)).toThrowError(
-        'Response Comment content is required', // Message from updateContent
+        'New content (CommentContent object) cannot be null.',
       );
     });
 
     it('should throw ArgumentNotProvidedException if newContent.Value has length < 3', () => {
-      const shortContent = CommentContent.create('Hi'); // VO allows this (len 2 >= MIN_LENGTH 1)
+      const shortContent = CommentContent.create('Hi');
       expect(() => response.updateContent(shortContent)).toThrowError(
-        'Response Comment content is required', // This message is a bit generic.
-        // Consider: 'Response content must be at least 3 characters long.'
+        'Response content must be at least 3 characters long.',
       );
     });
 

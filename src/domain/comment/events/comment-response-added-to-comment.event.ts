@@ -20,12 +20,6 @@ export class CommentResponseAddedToCommentEvent implements IDomainEvent {
     postId: Identifier,
     responseAuthorId: Identifier,
   ) {
-    console.log('------------------');
-    console.log('parentCommentId', parentCommentId);
-    console.log('responseId', responseId);
-    console.log('postId', postId);
-    console.log('responseAuthorId', responseAuthorId);
-    console.log('------------------');
     this.occurredOn = new Date();
     this.aggregateId = parentCommentId.Value;
     this.responseId = responseId.Value;

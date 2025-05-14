@@ -101,8 +101,6 @@ export class CreateCommentCommandHandler
 
     resultDto.replies = resultDto.replies ?? [];
 
-    console.log('resultDto --->', resultDto);
-
     return resultDto;
   }
 }

@@ -25,7 +25,6 @@ export class AuthResolver {
       GetUserByEmailQuery,
       UserOutputDto | null
     >(new GetUserByEmailQuery(input.email));
-    console.log('akiii', user);
     if (!user || !user.email || !user.username || !user.role || !user.id) {
       throw new Error('Invalid user data');
     }

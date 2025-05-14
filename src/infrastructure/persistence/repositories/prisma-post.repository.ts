@@ -56,7 +56,7 @@ export class PrismaPostRepository {
     categoryIds: Identifier[],
   ): Prisma.CategoryWhereUniqueInput[] {
     // Prisma connect/set expects an array of objects like { id: number }
-    return categoryIds.map((id) => ({ id: id.Value as number }));
+    return categoryIds.map((id) => ({ id: id.Value }));
   }
 
   // --- Repository Methods ---
@@ -71,7 +71,7 @@ export class PrismaPostRepository {
       title: post.title.Value,
       content: post.content.Value,
       published: post.isPublished,
-      userId: post.authorId?.Value as number,
+      userId: post.authorId?.Value,
     };
 
     if (baseData.userId === undefined || baseData.userId === null) {
@@ -86,7 +86,7 @@ export class PrismaPostRepository {
       if (isUpdate) {
         // --- UPDATE ---
         this.logger.debug(`Updating post with ID: ${postIdValue}`);
-        const idForWhere = postIdValue as number;
+        const idForWhere = postIdValue;
 
         savedOrUpdatedPrismaPost = await this._prisma.$transaction(
           async (tx) => {
@@ -203,15 +203,13 @@ export class PrismaPostRepository {
       whereClause.published = query.published;
     }
     if (query?.authorId) {
-      whereClause.userId = query.authorId.Value as number; // Ensure ID is number
+      whereClause.userId = query.authorId.Value;
     }
     if (query?.categoryId) {
-      // Find posts that have *at least* this category
       whereClause.categories = {
-        some: { id: query.categoryId.Value as number },
+        some: { id: query.categoryId.Value },
       };
     }
-    // Add other filter conditions here (e.g., search term)
     return whereClause;
   }
 
@@ -278,7 +276,6 @@ export class PrismaPostRepository {
   async delete(id: number): Promise<boolean> {
     this.logger.debug(`Attempting to delete post with ID: ${id}`);
     try {
-      console.log('id --->', id);
       const idForWhere = id;
       await this._prisma.post.delete({
         where: { id: idForWhere },

@@ -10,6 +10,8 @@ import {
 import { CommentCreatedEvent } from '../events/comment-created.event';
 import { CommentResponse } from './comment-response.entity';
 import { CommentDeletedEvent } from '../events/comment-deleted.event';
+import { CommentResponseAddedToCommentEvent } from '../events/comment-response-added-to-comment.event';
+import { ResponseRemovedFromCommentEvent } from '../events';
 
 /**
  * Defines the internal properties structure of a Comment entity.
@@ -115,7 +117,15 @@ export class Comment extends BaseEntity<CommentProps> {
     );
     if (!exists) {
       this._props.responses.push(responseToAdd);
-      this._props.updated_at = new Date(); // Update timestamp
+      this._props.updated_at = new Date();
+      this.addDomainEvent(
+        new CommentResponseAddedToCommentEvent(
+          this.id,
+          responseToAdd.id,
+          this.postId,
+          responseToAdd.userId,
+        ),
+      );
     }
   }
 
@@ -133,6 +143,13 @@ export class Comment extends BaseEntity<CommentProps> {
 
     if (this._props.responses.length < initialLength) {
       this._props.updated_at = new Date();
+      this.addDomainEvent(
+        new ResponseRemovedFromCommentEvent(
+          this.id,
+          responseIdToRemove,
+          this.postId,
+        ),
+      );
     }
   }
 
